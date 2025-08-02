@@ -1,0 +1,128 @@
+
+####################################################################
+# [OperatingSystem] — мусор ОС (macOS, Windows, Linux)
+OperatingSystem = { patterns = [
+  ".DS_Store",           # macOS Desktop metadata
+  "Thumbs.db",           # Windows Explorer thumbnail cache
+  "ehthumbs.db",
+  "Icon?",
+  ".Spotlight-V100",
+  ".Trashes",
+  "*.swp", "*.swo", "*~" # Vim/shell backup files
+]}
+
+####################################################################
+# [IDE] — файлы, генерируемые редакторами и IDE
+IDE = { patterns = [
+  ".idea/", "*.iml", "*.iws", "*.ipr",           # JetBrains IDEA / PyCharm / etc.
+  ".vscode/", "*.code-workspace",                # Visual Studio Code
+  ".cursor/", "*.cursor-workspace",              # Cursor IDE
+  "*.sln", "*.suo", "*.user", "*.ncb", "*.sdf",  # Visual Studio
+  ".metadata/", ".classpath", ".project",        # Eclipse
+  "*.launch",                                    # Eclipse run configs
+  "*.sublime-project", "*.sublime-workspace",    # Sublime Text
+  ".atom/",                                      # Atom
+  ".emacs.d/", "*.elc", "*.eln",                 # Emacs
+  ".vim/", "*.viminfo",                          # Vim
+  "#*#",                                         # Generic lock/temp
+  "*.tmproj"                                     # TextMate
+]}
+
+####################################################################
+# [BuildArtifacts] — результаты сборки, бинарники, кэш компиляций
+BuildArtifacts = { patterns = [
+  "__pycache__/", "*.py[cod]", "*$py.class", "*.pyd", "*.so",
+  "*.o", "*.obj", "*.dll", "*.exe", "*.dylib", "*.lib",
+  "*.class", "*.jar", "*.war", "*.ear", "*.class",
+  "build/", "dist/", "target/", "cmake-build-*/", "out/", "bin/", "obj/"
+]}
+
+####################################################################
+# [Python] — файлы и каталоги, специфичные для Python-окружений
+Python = { patterns = [
+  "venv/", ".venv/", "env/", "ENV/", "env.bak/", "venv.bak/", ".Python",  # virtual environments
+  "pip-wheel-metadata/", "*.egg-info/", "*.egg", ".eggs/",
+  "build/", "dist/", "develop-eggs/", "*.egg-info/", "share/python-wheels/",
+  ".tox/", ".nox/", ".coverage", ".coverage.*", "htmlcov/", ".pytest_cache/",
+  ".cache/", "*.pylint.d/", ".mypy_cache/", ".pyre/", ".pytype/", ".ruff_cache/",
+  "__pypackages__/", "Pipfile.lock", "poetry.lock",
+  ".ipynb_checkpoints/", "profile_default/", "ipython_config.py",
+  "docs/_build/"
+]}
+
+####################################################################
+# [Java] — файлы и каталоги JVM, Gradle, Maven
+Java = { patterns = [
+  "target/", "*.jar", "*.war", "*.ear", "*.class",
+  ".classpath", ".project", ".settings/", ".idea/", "*.iml", "hs_err_pid*", "*.log",
+  ".gradle/", "build/", "out/", "*.hprof", "*.kotlin_module"
+]}
+
+####################################################################
+# [NodeJS] — файлы и каталоги Node / frontend сборки
+NodeJS = { patterns = [
+  "node_modules/", "package-lock.json", "yarn.lock", "npm-debug.log*", "yarn-error.log*",
+  "dist/", "build/", ".cache/", ".parcel-cache/", ".next/", ".nuxt/", ".turbo/",
+  ".pnpm-debug.log", ".pnp.cjs", ".pnp.data.json", "*.tsbuildinfo"
+]}
+
+####################################################################
+# [Go] — файлы и модули Go
+Go = { patterns = [
+  "bin/", "pkg/", "vendor/", "*.exe", "*.exe.stackdump", "Godeps/", "Godeps.json",
+  "go.sum", "go.mod", "*.test", "*.out"
+]}
+
+####################################################################
+# [Rust] — Rust Cargo
+Rust = { patterns = [
+  "target/", "*.rs.bk", "Cargo.lock", "*.rlib", "*.dSYM/"
+]}
+
+####################################################################
+# [DotNet] — .NET / C#
+DotNet = { patterns = [
+  "bin/", "obj/", "*.user", "*.suo", "*.csproj.user", "*.vcxproj.user",
+  ".vs/", "*.pdb", "*.cache", "GeneratedInternalTypeHelper.g.cs", "*.suo"
+]}
+
+####################################################################
+# [Android_iOS] — мобильная платформа Android / Xcode / Swift
+Android_iOS = { patterns = [
+  "*.apk", "*.ap_", "*.dex", "*.class", "*.aar", "*.jar", "build/", ".gradle/",
+  "*.xcworkspace", "*.xcodeproj/", "xcuserdata/", "DerivedData/", "*.xcuserstate", "*.xcdatamodeld", "*.xcassets/"
+]}
+
+####################################################################
+# [Containers_CI] — Docker, Kubernetes, Terraform, CI/CD артефакты
+Containers_CI = { patterns = [
+  ".env", ".envrc", ".terraform/", "*.tfstate", "*.tfstate.backup", "*.tfvars",
+  ".dockerignore", "**/docker-compose.override.yml", ".helm/", "**/helmfile.d/",
+  "*.kubeconfig", "charts-*.tgz", "docker*.log", "*.log", ".circleci/", ".github/", ".gitlab-ci.yml", "Jenkinsfile", "*.yml"
+]}
+
+####################################################################
+# [Logs_Tmp] — журналы, кеши, временные файлы
+Logs_Tmp = { patterns = [
+  "*.log", "logs/", "**/tmp/", "**/temp/", "*.tmp", "*.bak", "*.old", "*.orig",
+  "*.pid", "*.~lock*", "#*#", "*.swp"
+]}
+
+####################################################################
+# [LaTeX_Metadata] — LaTeX / Pandoc артефакты
+LaTeX_Metadata = { patterns = [
+  "*.aux", "*.bbl", "*.blg", "*.brf", "*.idx", "*.ilg", "*.ind", "*.log", "*.out",
+  "*.toc", "*.nav", "*.snm", "*.vrb"
+]}
+
+####################################################################
+# [Documentation] — doc-генерация (Sphinx, MkDocs, Hugo и т.п.)
+Documentation = { patterns = [
+  "docs/_build/", "site/", ".next/", "public/", "_site/", ".vuepress/", ".hugo_cache/"
+]}
+
+####################################################################
+# [CustomDiagnostics] — кастомные шаблоны
+CustomDiagnostics = { patterns = [
+  "**/.pytest_cache/**", ".hypothesis/", "*.cover", "*.coveragerc", "*.test.results"
+]}
