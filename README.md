@@ -113,8 +113,15 @@ The script:
 - Downloads the repository from GitHub
 - Installs Python dependencies
 - Configures Cursor IDE
+- **Merges gitignore rules** (preserves your custom rules)
 - Verifies the installation
 - Cleans up temporary files
+
+**Gitignore Rules Merging:**
+During installation, the script automatically merges the distributor's `how_to_do_gitignore.toml` with your existing user file at `~/.cursor/tools/how_to_do_gitignore.toml`. This ensures:
+- Your custom rules are preserved during updates
+- Backup of the original file is created before merging
+- Backup of the original file is created
 
 #### Manual Installation
 
@@ -319,6 +326,41 @@ Creates and updates .gitignore file based on project structure analysis.
 
 **Customization:**
 You can extend the `how_to_do_gitignore.toml` file with your own rules to match your specific project needs. The tool will automatically include your custom rules in the filtering process.
+
+**Gitignore Rules Merging:**
+The tool automatically merges rules from the distributor file (`how_to_do_gitignore.toml`) with your custom user file located at `~/.cursor/tools/how_to_do_gitignore.toml`. This allows you to:
+
+- **Preserve your custom rules** when updating the tool
+- **Combine distributor and user rules** with automatic deduplication
+- **Add new categories** specific to your projects
+- **Override distributor rules** with your own preferences
+
+**User Rules Priority:**
+- Your custom rules take priority over distributor rules
+- Duplicate patterns are automatically removed
+- New categories from your file are preserved
+- The merge process is automatic and transparent
+
+**Example user file structure:**
+```toml
+# ~/.cursor/tools/how_to_do_gitignore.toml
+IDE = { patterns = [
+  ".vscode/",            # Visual Studio Code
+  ".sublime-project",    # Sublime Text (custom)
+  ".atom/"               # Atom (custom)
+]}
+
+Python = { patterns = [
+  "venv/",               # virtual environments
+  "pip-wheel-metadata/", # pip metadata (custom)
+  ".tox/"                # tox (custom)
+]}
+
+CustomCategory = { patterns = [
+  "my-custom-pattern",   # Custom user pattern
+  "another-pattern"      # Another custom pattern
+]}
+```
 
 **Example:**
 ```python

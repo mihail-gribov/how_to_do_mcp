@@ -1,0 +1,143 @@
+# Пример пользовательского файла gitignore.toml
+# Расположение: ~/.cursor/tools/how_to_do_gitignore.toml
+# 
+# Этот файл автоматически мержится с дистрибутивным файлом при установке
+# Ваши правила имеют приоритет над дистрибутивными
+
+####################################################################
+# [IDE] — дополнительные редакторы и IDE
+IDE = { patterns = [
+  ".vscode/",            # Visual Studio Code
+  ".sublime-project",    # Sublime Text
+  ".atom/",              # Atom
+  ".brackets.json",      # Brackets
+  "*.sublime-workspace", # Sublime Text workspace
+  ".vscode/settings.json", # VS Code settings
+  ".vscode/launch.json", # VS Code launch config
+  ".vscode/tasks.json"   # VS Code tasks
+]}
+
+####################################################################
+# [Python] — дополнительные Python правила
+Python = { patterns = [
+  "venv/",               # virtual environments
+  "pip-wheel-metadata/", # pip metadata
+  ".tox/",               # tox testing
+  ".pytest_cache/",      # pytest cache
+  ".coverage",           # coverage reports
+  "htmlcov/",            # coverage HTML
+  ".mypy_cache/",        # mypy cache
+  "*.pyc",               # Python compiled files
+  "__pycache__/",        # Python cache directories
+  "*.pyo",               # Python optimized files
+  "*.pyd",               # Python DLL files
+  ".Python",             # Python virtual environment
+  "pip-log.txt",         # pip logs
+  "pip-delete-this-directory.txt", # pip cleanup
+  ".env",                # environment variables
+  ".venv",               # virtual environment
+  "ENV/",                # virtual environment
+  "env/",                # virtual environment
+  "venv/",               # virtual environment
+  "ENV/",                # virtual environment
+  "env.bak/",            # virtual environment backup
+  "venv.bak/"            # virtual environment backup
+]}
+
+####################################################################
+# [CustomProject] — специфичные для вашего проекта правила
+CustomProject = { patterns = [
+  "config/local.json",   # локальные настройки
+  "logs/",               # логи приложения
+  "temp/",               # временные файлы
+  "cache/",              # кэш приложения
+  "uploads/",            # загруженные файлы
+  "backups/",            # резервные копии
+  "*.log",               # лог файлы
+  "*.tmp",               # временные файлы
+  "*.bak",               # резервные файлы
+  "*.swp",               # vim swap files
+  "*.swo",               # vim swap files
+  "*~",                  # backup files
+  ".DS_Store",           # macOS system files
+  "Thumbs.db",           # Windows thumbnails
+  "desktop.ini"          # Windows desktop settings
+]}
+
+####################################################################
+# [Database] — файлы баз данных
+Database = { patterns = [
+  "*.db",                # SQLite databases
+  "*.sqlite",            # SQLite databases
+  "*.sqlite3",           # SQLite databases
+  "*.db-journal",        # SQLite journal files
+  "*.sqlite-journal",    # SQLite journal files
+  "*.sqlite3-journal",   # SQLite journal files
+  "*.rdb",               # Redis dump files
+  "*.aof",               # Redis append-only files
+  "dump.rdb",            # Redis dump
+  "appendonly.aof"       # Redis append-only
+]}
+
+####################################################################
+# [Secrets] — секретные файлы и ключи
+Secrets = { patterns = [
+  ".env",                # environment variables
+  ".env.local",          # local environment
+  ".env.production",     # production environment
+  ".env.staging",        # staging environment
+  ".env.development",    # development environment
+  "secrets.json",        # secrets file
+  "config/secrets.json", # secrets in config
+  "*.key",               # private keys
+  "*.pem",               # certificates
+  "*.crt",               # certificates
+  "*.p12",               # certificates
+  "*.pfx",               # certificates
+  "id_rsa",              # SSH private key
+  "id_rsa.pub",          # SSH public key
+  "known_hosts",         # SSH known hosts
+  ".ssh/",               # SSH directory
+  "credentials.json",    # credentials file
+  "service-account.json" # service account
+]}
+
+####################################################################
+# [BuildOutput] — результаты сборки
+BuildOutput = { patterns = [
+  "dist/",               # distribution files
+  "build/",              # build files
+  "out/",                # output files
+  "target/",             # target directory
+  "bin/",                # binary files
+  "obj/",                # object files
+  "*.exe",               # executable files
+  "*.dll",               # dynamic libraries
+  "*.so",                # shared objects
+  "*.dylib",             # dynamic libraries (macOS)
+  "*.a",                 # static libraries
+  "*.o",                 # object files
+  "*.class",             # Java class files
+  "*.jar",               # Java archives
+  "*.war",               # Web archives
+  "*.ear",               # Enterprise archives
+  "*.apk",               # Android packages
+  "*.ipa",               # iOS packages
+  "*.app",               # macOS applications
+  "*.dmg",               # macOS disk images
+  "*.deb",               # Debian packages
+  "*.rpm",               # RPM packages
+  "*.msi",               # Windows installers
+  "*.zip",               # compressed files
+  "*.tar.gz",            # compressed files
+  "*.tar.bz2",           # compressed files
+  "*.7z",                # compressed files
+  "*.rar"                # compressed files
+]}
+
+# Примечания:
+# 1. Этот файл автоматически мержится с дистрибутивным файлом
+# 2. Ваши правила имеют приоритет над дистрибутивными
+# 3. Дубликаты автоматически удаляются
+# 4. Новые категории добавляются к существующим
+# 5. При обновлении инструмента ваши правила сохраняются 

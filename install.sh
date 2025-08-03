@@ -212,11 +212,58 @@ download_project() {
             fi
         }
         
+        # Function to merge and backup gitignore.toml
+        merge_and_backup_gitignore_toml() {
+            local source_file="$1"
+            local target_file="$HOME/.cursor/tools/$2"
+            local timestamp=$(date +"%Y%m%d_%H%M%S")
+            
+            if [ -f "$target_file" ]; then
+                print_status $YELLOW "User gitignore.toml found, performing merge..."
+                
+                # Create backup of user file
+                cp "$target_file" "$target_file.backup.$timestamp"
+                print_status $CYAN "Created backup: $2.backup.$timestamp"
+                
+                # Try to merge using Python script with optimized I/O
+                if python3 -c "
+import sys
+import os
+sys.path.insert(0, os.getcwd())
+from how_to_do import merge_gitignore_toml_files, save_merged_gitignore_toml
+
+try:
+    # Оптимизированный мерж с минимальными I/O операциями
+    merged_data = merge_gitignore_toml_files('$source_file', '$target_file')
+    if save_merged_gitignore_toml(merged_data, '$target_file'):
+        print('Merge successful')
+        exit(0)
+    else:
+        print('Merge failed')
+        exit(1)
+except Exception as e:
+    print(f'Merge error: {e}')
+    exit(1)
+"; then
+                    print_status $GREEN "Successfully merged gitignore.toml"
+                else
+                    print_status $YELLOW "Merge failed, falling back to distributor file"
+                    cp "$source_file" "$target_file"
+                    print_status $GREEN "Restored distributor gitignore.toml"
+                fi
+            else
+                cp "$source_file" "$target_file"
+                print_status $GREEN "Created new gitignore.toml"
+            fi
+        }
+        
         # Backup and copy main script using check_and_backup_file function
         check_and_backup_file "how_to_do.py" "how_to_do.py"
         
         check_and_backup_file "how_to_do.json" "how_to_do.json"
-        check_and_backup_file "how_to_do_gitignore.toml" "how_to_do_gitignore.toml"
+        
+        # Use merge function for gitignore.toml
+        merge_and_backup_gitignore_toml "how_to_do_gitignore.toml" "how_to_do_gitignore.toml"
         chmod +x "$HOME/.cursor/tools/how_to_do.py"
         print_status $GREEN "Files processed in $HOME/.cursor/tools/"
     else
