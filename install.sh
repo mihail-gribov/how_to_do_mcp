@@ -226,11 +226,16 @@ download_project() {
                 print_status $CYAN "Created backup: $2.backup.$timestamp"
                 
                 # Try to merge using Python script with optimized I/O
+                # First, copy installer.py to current directory if it exists in the original location
+                if [ -f "/home/mike/Projects/how_to_do/installer.py" ]; then
+                    cp "/home/mike/Projects/how_to_do/installer.py" .
+                fi
+                
                 if python3 -c "
 import sys
 import os
 sys.path.insert(0, os.getcwd())
-from how_to_do import merge_gitignore_toml_files, save_merged_gitignore_toml
+from installer import merge_gitignore_toml_files, save_merged_gitignore_toml
 
 try:
     # Оптимизированный мерж с минимальными I/O операциями

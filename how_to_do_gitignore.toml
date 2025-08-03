@@ -16,7 +16,7 @@ OperatingSystem = { patterns = [
 IDE = { patterns = [
   ".idea/", "*.iml", "*.iws", "*.ipr",           # JetBrains IDEA / PyCharm / etc.
   ".vscode/", "*.code-workspace",                # Visual Studio Code
-  ".cursor/", "*.cursor-workspace",              # Cursor IDE
+  ".cursor/", ".features/","*.cursor-workspace",              # Cursor IDE
   "*.sln", "*.suo", "*.user", "*.ncb", "*.sdf",  # Visual Studio
   ".metadata/", ".classpath", ".project",        # Eclipse
   "*.launch",                                    # Eclipse run configs

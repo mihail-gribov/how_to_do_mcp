@@ -1,9 +1,11 @@
 # IDE
 .cursor/
+.features/
 
 # BuildArtifacts
 __pycache__/
 *.py[cod]
+venv/
 
 # Logs_Tmp
 logs/
