@@ -195,15 +195,16 @@ download_project() {
         check_and_backup_file() {
             local source_file="$1"
             local target_file="$HOME/.cursor/tools/$2"
+            local timestamp=$(date +"%Y%m%d_%H%M%S")
             
             if [ -f "$target_file" ]; then
                 if cmp -s "$source_file" "$target_file"; then
                     print_status $CYAN "File $2 is up to date, skipping"
                 else
                     print_status $YELLOW "File $2 differs, creating backup"
-                    cp "$target_file" "$target_file.backup"
+                    cp "$target_file" "$target_file.backup.$timestamp"
                     cp "$source_file" "$target_file"
-                    print_status $GREEN "Updated $2 (backup created)"
+                    print_status $GREEN "Updated $2 (backup created: $2.backup.$timestamp)"
                 fi
             else
                 cp "$source_file" "$target_file"
@@ -211,7 +212,9 @@ download_project() {
             fi
         }
         
-        cp "how_to_do.py" "$HOME/.cursor/tools/"
+        # Backup and copy main script using check_and_backup_file function
+        check_and_backup_file "how_to_do.py" "how_to_do.py"
+        
         check_and_backup_file "how_to_do.json" "how_to_do.json"
         check_and_backup_file "how_to_do_gitignore.toml" "how_to_do_gitignore.toml"
         chmod +x "$HOME/.cursor/tools/how_to_do.py"
@@ -239,15 +242,49 @@ install_python_dependencies() {
 # 
 # Configures Cursor IDE to work with MCP server:
 # 1. Creates Cursor configuration directory (if not exists)
-# 2. Determines absolute path to MCP server script
-# 3. Creates or updates MCP configuration in ~/.cursor/mcp.json
-# 4. Creates backup of existing configuration
+# 2. Checks and creates required files (how_to_do.py, mcp.json)
+# 3. Determines absolute path to MCP server script
+# 4. Creates or updates MCP configuration in ~/.cursor/mcp.json
+# 5. Creates backup of existing configuration
 #
 setup_cursor() {
     print_status $BLUE "Configuring Cursor IDE..."
     
     # Create configuration directory
     mkdir -p "$CURSOR_CONFIG_DIR"
+    mkdir -p "$HOME/.cursor/tools"
+    
+    # Check and create/update how_to_do.py
+    if [ ! -f "$HOME/.cursor/tools/how_to_do.py" ]; then
+        print_status $YELLOW "how_to_do.py not found, creating from project files..."
+        if [ -f "how_to_do.py" ]; then
+            cp "how_to_do.py" "$HOME/.cursor/tools/"
+            chmod +x "$HOME/.cursor/tools/how_to_do.py"
+            print_status $GREEN "Created how_to_do.py in $HOME/.cursor/tools/"
+        else
+            print_status $RED "ERROR: how_to_do.py not found in project directory"
+            exit 1
+        fi
+    elif [ -f "how_to_do.py" ] && ! cmp -s "how_to_do.py" "$HOME/.cursor/tools/how_to_do.py"; then
+        print_status $YELLOW "how_to_do.py differs from project version, updating..."
+        local timestamp=$(date +"%Y%m%d_%H%M%S")
+        cp "$HOME/.cursor/tools/how_to_do.py" "$HOME/.cursor/tools/how_to_do.py.backup.$timestamp"
+        cp "how_to_do.py" "$HOME/.cursor/tools/"
+        chmod +x "$HOME/.cursor/tools/how_to_do.py"
+        print_status $GREEN "Updated how_to_do.py (backup created: how_to_do.py.backup.$timestamp)"
+    fi
+    
+    # Check and create mcp.json if not exists
+    if [ ! -f "$MCP_CONFIG" ]; then
+        print_status $YELLOW "mcp.json not found, creating new configuration..."
+        cat > "$MCP_CONFIG" << EOF
+{
+  "mcpServers": {
+  }
+}
+EOF
+        print_status $GREEN "Created new mcp.json configuration"
+    fi
     
     # Determine absolute path to script in user's home directory
     SCRIPT_PATH="$HOME/.cursor/tools/how_to_do.py"
@@ -274,9 +311,10 @@ EOF
     # Merge with existing configuration if exists
     if [ -f "$MCP_CONFIG" ]; then
         print_status $YELLOW "Updating existing MCP configuration..."
-        # Create backup
-        cp "$MCP_CONFIG" "$MCP_CONFIG.backup"
-        print_status $CYAN "Backup created: $MCP_CONFIG.backup"
+        # Create backup with timestamp
+        local timestamp=$(date +"%Y%m%d_%H%M%S")
+        cp "$MCP_CONFIG" "$MCP_CONFIG.backup.$timestamp"
+        print_status $CYAN "Backup created: $MCP_CONFIG.backup.$timestamp"
         
         # Merge configurations - add how_to_do to existing servers
         # Use jq for proper JSON merging if available, otherwise use simple approach
@@ -310,6 +348,7 @@ EOF
 # 2. Checks script execution permissions
 # 3. Fixes execution permissions if necessary
 # 4. Checks for Cursor configuration presence
+# 5. Validates configuration structure
 #
 # This verification ensures that:
 # - MCP server can be launched by Cursor IDE
@@ -331,15 +370,28 @@ verify_installation() {
         fi
     else
         print_status $RED "ERROR: Script not found in $HOME/.cursor/tools/"
+        print_status $YELLOW "Try running the installer again"
         return 1
     fi
     
     # Check Cursor configuration
     if [ -f "$MCP_CONFIG" ]; then
         print_status $GREEN "Cursor configuration found"
+        
+        # Validate configuration structure
+        if grep -q '"how_to_do"' "$MCP_CONFIG"; then
+            print_status $GREEN "HOW TO DO server configured in mcp.json"
+        else
+            print_status $YELLOW "WARNING: HOW TO DO server not found in mcp.json configuration"
+            print_status $YELLOW "Configuration may need to be updated manually"
+        fi
     else
-        print_status $YELLOW "Cursor configuration not found"
+        print_status $RED "ERROR: Cursor configuration not found at $MCP_CONFIG"
+        print_status $YELLOW "Try running the installer again"
+        return 1
     fi
+    
+    print_status $GREEN "Installation verification completed successfully"
 }
 
 # Function to display project information
