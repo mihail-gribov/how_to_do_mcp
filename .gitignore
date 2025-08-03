@@ -1,9 +1,9 @@
 # IDE
 .cursor/
 
-# Containers_CI
-.github/
-*.yml
+# BuildArtifacts
+__pycache__/
+*.py[cod]
 
 # Logs_Tmp
 logs/

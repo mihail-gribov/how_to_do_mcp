@@ -71,16 +71,40 @@ def load_gitignore_rules() -> Dict[str, List[str]]:
 def scan_project_files(project_path: str) -> Set[str]:
     """Scans the project file structure"""
     files = set()
-    project_path = Path(project_path)
+    project_path = Path(project_path).resolve()
     
     try:
-        for item in project_path.rglob('*'):
-            relative_path = item.relative_to(project_path)
+        import os
+        
+        for root, dirs, filenames in os.walk(project_path, followlinks=False):
+            # Convert to Path objects for easier handling
+            root_path = Path(root)
             
-            if item.is_file():
-                files.add(str(relative_path))
-            elif item.is_dir():
-                files.add(str(relative_path) + '/')
+            # Skip if outside project boundaries
+            try:
+                relative_root = root_path.relative_to(project_path)
+            except ValueError:
+                continue
+            
+            # Add directories
+            for dirname in dirs:
+                try:
+                    dir_path = root_path / dirname
+                    if not dir_path.is_symlink():
+                        relative_dir = dir_path.relative_to(project_path)
+                        files.add(str(relative_dir) + '/')
+                except (OSError, PermissionError):
+                    continue
+            
+            # Add files
+            for filename in filenames:
+                try:
+                    file_path = root_path / filename
+                    if not file_path.is_symlink():
+                        relative_file = file_path.relative_to(project_path)
+                        files.add(str(relative_file))
+                except (OSError, PermissionError):
+                    continue
         
         logger.info(f"Scanned {len(files)} items in project")
         return files
