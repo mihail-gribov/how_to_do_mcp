@@ -192,7 +192,7 @@ download_project() {
         mkdir -p "$HOME/.cursor/tools"
         cp "how_to_do.py" "$HOME/.cursor/tools/"
         cp "how_to_do.json" "$HOME/.cursor/tools/"
-        cp "for_gitignore.toml" "$HOME/.cursor/tools/"
+        cp "how_to_do_gitignore.toml" "$HOME/.cursor/tools/"
         chmod +x "$HOME/.cursor/tools/how_to_do.py"
         print_status $GREEN "Files copied to $HOME/.cursor/tools/"
     else

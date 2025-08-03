@@ -307,18 +307,18 @@ Creates and updates .gitignore file based on project structure analysis.
 
 **How it works:**
 1. **Scans the project structure** - analyzes all files and directories in your project
-2. **Reads source rules** - loads the initial rule set from `for_gitignore.toml`
+2. **Reads source rules** - loads the initial rule set from `how_to_do_gitignore.toml`
 3. **Filters rules** - keeps only rules that match files/directories actually present in your project
 4. **Generates optimized .gitignore** - creates a clean, relevant .gitignore file
 
 **Capabilities:**
 - Automatic file structure analysis
 - Rule filtering based on actual project content
-- Application of rules from for_gitignore.toml
+- Application of rules from how_to_do_gitignore.toml
 - Creation of optimized .gitignore with only relevant rules
 
 **Customization:**
-You can extend the `for_gitignore.toml` file with your own rules to match your specific project needs. The tool will automatically include your custom rules in the filtering process.
+You can extend the `how_to_do_gitignore.toml` file with your own rules to match your specific project needs. The tool will automatically include your custom rules in the filtering process.
 
 **Example:**
 ```python

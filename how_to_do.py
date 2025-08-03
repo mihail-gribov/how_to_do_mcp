@@ -50,9 +50,9 @@ def get_project_path() -> str:
     return os.getcwd()
 
 def load_gitignore_rules() -> Dict[str, List[str]]:
-    """Loads rules from for_gitignore.toml"""
+    """Loads rules from how_to_do_gitignore.toml"""
     try:
-        toml_path = os.path.join(os.path.dirname(__file__), 'for_gitignore.toml')
+        toml_path = os.path.join(os.path.dirname(__file__), 'how_to_do_gitignore.toml')
         with open(toml_path, 'rb') as f:
             data = tomllib.load(f)
         
