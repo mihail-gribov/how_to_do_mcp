@@ -57,14 +57,31 @@ class TestHowToDo(unittest.TestCase):
             temp_how_to_do = os.path.join(self.temp_dir, "how_to_do.py")
             with open(temp_how_to_do, 'w') as f:
                 f.write("# Test file")
-            
+    
+            # Создаем временный файл how_to_do.json
+            temp_json = os.path.join(self.temp_dir, "how_to_do.json")
+            test_config = {
+                "tools": {
+                    "test_command": {
+                        "description": "Test command",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {}
+                        },
+                        "prompt": "Test prompt"
+                    }
+                }
+            }
+            with open(temp_json, 'w') as f:
+                json.dump(test_config, f)
+    
             # Временно заменяем __file__
             how_to_do.__file__ = temp_how_to_do
-            
+    
             # Тестируем загрузку конфигурации
             config = load_config()
             self.assertIsInstance(config, dict)
-            self.assertIn("commands", config)
+            self.assertIn("tools", config)
             
         finally:
             # Восстанавливаем оригинальный __file__

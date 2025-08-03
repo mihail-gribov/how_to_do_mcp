@@ -92,10 +92,16 @@
       "description": "Creates and updates .gitignore file based on project structure analysis and rules from how_to_do_gitignore.toml",
       "inputSchema": {
         "type": "object",
-        "properties": {},
+        "properties": {
+          "project_path": {
+            "type": "string",
+            "description": "Path to the project for which .gitignore file needs to be generated"
+          }
+        },
+        "required": ["project_path"],
         "additionalProperties": false
       },
-      "prompt": "Create .gitignore file ONLY with provided rules\n\n**RULES FOR USE (STRICTLY ONLY THESE):**\n{rules_by_category}\n\n**Statistics:**\n- Total rules: {total_rules}\n- Categories: {categories_count}\n\n**CRITICALLY IMPORTANT:**\n1. Use ONLY rules from the list above\n2. DO NOT add any additional rules\n3. DO NOT add general rules like *.log, *.tmp, *.bak, etc.\n4. DO NOT add rules for OS, IDE or other categories\n5. Create .gitignore file in project root\n6. Group rules by categories with comments\n7. Add empty lines between categories\n\n**Output format:**\n```\n# Category\nrule1\nrule2\n\n# Another category\nrule3\n```\n\n**Result:** Created .gitignore file ONLY with provided rules. Report: which categories were created and how many rules in each."
+      "prompt": "Create .gitignore file ONLY with provided rules\n\n**PROJECT INFORMATION:**\n- Project path: {project_path}\n- .gitignore file path: {gitignore_path}\n\n**RULES FOR USE (STRICTLY ONLY THESE):**\n{rules_by_category}\n\n**Statistics:**\n- Total rules: {total_rules}\n- Categories: {categories_count}\n\n**CRITICALLY IMPORTANT:**\n1. Use ONLY rules from the list above\n2. DO NOT add any additional rules\n3. DO NOT add general rules like *.log, *.tmp, *.bak, etc.\n4. DO NOT add rules for OS, IDE or other categories\n5. Create .gitignore file in project root\n6. Group rules by categories with comments\n7. Add empty lines between categories\n\n**Output format:**\n```\n# Category\nrule1\nrule2\n\n# Another category\nrule3\n```\n\n**Result:** Created .gitignore file ONLY with provided rules. Report: which categories were created and how many rules in each.\n\n**REPORT:**\n- Project scanned: {project_path}\n- .gitignore file created: {gitignore_path}\n- Total rules applied: {total_rules}\n- Categories used: {categories_count}"
     }
   }
 }

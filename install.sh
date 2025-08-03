@@ -191,20 +191,18 @@ download_project() {
         print_status $CYAN "Copying files to user directory..."
         mkdir -p "$HOME/.cursor/tools"
         
-        # Function to check and backup files
+        # Function to check and update files
         check_and_backup_file() {
             local source_file="$1"
             local target_file="$HOME/.cursor/tools/$2"
-            local timestamp=$(date +"%Y%m%d_%H%M%S")
             
             if [ -f "$target_file" ]; then
                 if cmp -s "$source_file" "$target_file"; then
                     print_status $CYAN "File $2 is up to date, skipping"
                 else
-                    print_status $YELLOW "File $2 differs, creating backup"
-                    cp "$target_file" "$target_file.backup.$timestamp"
+                    print_status $YELLOW "File $2 differs, updating"
                     cp "$source_file" "$target_file"
-                    print_status $GREEN "Updated $2 (backup created: $2.backup.$timestamp)"
+                    print_status $GREEN "Updated $2"
                 fi
             else
                 cp "$source_file" "$target_file"
@@ -212,18 +210,13 @@ download_project() {
             fi
         }
         
-        # Function to merge and backup gitignore.toml
+        # Function to merge gitignore.toml
         merge_and_backup_gitignore_toml() {
             local source_file="$1"
             local target_file="$HOME/.cursor/tools/$2"
-            local timestamp=$(date +"%Y%m%d_%H%M%S")
             
             if [ -f "$target_file" ]; then
                 print_status $YELLOW "User gitignore.toml found, performing merge..."
-                
-                # Create backup of user file
-                cp "$target_file" "$target_file.backup.$timestamp"
-                print_status $CYAN "Created backup: $2.backup.$timestamp"
                 
                 # Try to merge using Python script with optimized I/O
                 # First, copy installer.py to current directory if it exists in the original location
@@ -319,11 +312,9 @@ setup_cursor() {
         fi
     elif [ -f "how_to_do.py" ] && ! cmp -s "how_to_do.py" "$HOME/.cursor/tools/how_to_do.py"; then
         print_status $YELLOW "how_to_do.py differs from project version, updating..."
-        local timestamp=$(date +"%Y%m%d_%H%M%S")
-        cp "$HOME/.cursor/tools/how_to_do.py" "$HOME/.cursor/tools/how_to_do.py.backup.$timestamp"
         cp "how_to_do.py" "$HOME/.cursor/tools/"
         chmod +x "$HOME/.cursor/tools/how_to_do.py"
-        print_status $GREEN "Updated how_to_do.py (backup created: how_to_do.py.backup.$timestamp)"
+        print_status $GREEN "Updated how_to_do.py"
     fi
     
     # Check and create mcp.json if not exists
@@ -363,10 +354,6 @@ EOF
     # Merge with existing configuration if exists
     if [ -f "$MCP_CONFIG" ]; then
         print_status $YELLOW "Updating existing MCP configuration..."
-        # Create backup with timestamp
-        local timestamp=$(date +"%Y%m%d_%H%M%S")
-        cp "$MCP_CONFIG" "$MCP_CONFIG.backup.$timestamp"
-        print_status $CYAN "Backup created: $MCP_CONFIG.backup.$timestamp"
         
         # Merge configurations - add how_to_do to existing servers
         # Use jq for proper JSON merging if available, otherwise use simple approach

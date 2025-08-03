@@ -13,26 +13,26 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Set
 from pathlib import Path
 
-# Кэш для результатов мержа
+# Cache for merge results
 _merge_cache = {}
 _cache_timestamp = None
-_cache_duration = timedelta(minutes=5)  # Кэш на 5 минут
+_cache_duration = timedelta(minutes=5)  # Cache for 5 minutes
 
 def _is_cache_valid() -> bool:
-    """Проверяет, действителен ли кэш"""
+    """Checks if the cache is valid"""
     global _cache_timestamp
     if _cache_timestamp is None:
         return False
     return datetime.now() - _cache_timestamp < _cache_duration
 
 def _clear_cache():
-    """Очищает кэш"""
+    """Clears the cache"""
     global _merge_cache, _cache_timestamp
     _merge_cache = {}
     _cache_timestamp = None
 
 def _update_cache(data: Dict[str, List[str]]):
-    """Обновляет кэш"""
+    """Updates the cache"""
     global _merge_cache, _cache_timestamp
     _merge_cache = data.copy()
     _cache_timestamp = datetime.now()
@@ -48,6 +48,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 _config = None
+
+def get_project_path() -> str:
+    """Gets the path to the current project"""
+    project_path = os.getenv('PROJECT_PATH')
+    if project_path:
+        return project_path
+    
+    return os.getcwd()
 
 def load_config():
     """Loads configuration from JSON file"""
@@ -65,24 +73,15 @@ def load_config():
         logger.error(f"Failed to load configuration: {str(e)}")
         raise RuntimeError(f"Failed to load configuration: {str(e)}")
 
-def get_project_path() -> str:
-    """Gets the path to the current project"""
-    project_path = os.getenv('PROJECT_PATH')
-    if project_path:
-        return project_path
-    
-    return os.getcwd()
-
-
 
 def load_gitignore_rules() -> Dict[str, List[str]]:
     """Loads rules from how_to_do_gitignore.toml (already merged during installation)"""
     try:
-        # Загружаем готовый мерженный файл из tools директории
+        # Load the ready merged file from tools directory
         rules_path = os.path.join(os.path.expanduser('~'), '.cursor', 'tools', 'how_to_do_gitignore.toml')
         
         if not os.path.exists(rules_path):
-            # Fallback к дистрибутивному файлу если мерженный не найден
+            # Fallback to distributor file if merged file not found
             distributor_path = os.path.join(os.path.dirname(__file__), 'how_to_do_gitignore.toml')
             if os.path.exists(distributor_path):
                 logger.warning("Merged gitignore.toml not found, using distributor file")
@@ -187,9 +186,13 @@ def match_pattern(pattern: str, files: Set[str]) -> bool:
 def analyze_project_for_gitignore(project_path: str) -> Dict[str, List[str]]:
     """Analyzes the project and returns grouped rules by categories"""
     try:
+        # Log the project directory name
+        project_name = os.path.basename(project_path)
+        logger.info(f"Analyzing project directory: {project_name} ({project_path})")
+        
         rules = load_gitignore_rules()
         
-        # Логируем источник правил
+        # Log the source of rules
         user_path = os.path.join(os.path.expanduser('~'), '.cursor', 'tools', 'how_to_do_gitignore.toml')
         if os.path.exists(user_path):
             logger.info("Using merged gitignore rules (distributor + user)")
@@ -331,7 +334,13 @@ def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
                 # Special handling for generate_gitignore
                 if name == "generate_gitignore":
                     try:
-                        project_path = get_project_path()
+                        # Get project_path from agent parameters
+                        project_path = arguments.get("project_path")
+                        if not project_path:
+                            # Fallback to current directory if no path provided
+                            project_path = get_project_path()
+                            logger.warning("No project_path provided, using current directory")
+                        
                         rules_by_category = analyze_project_for_gitignore(project_path)
                         
                         # Format rules for prompt
@@ -345,11 +354,16 @@ def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
                         
                         # Get prompt from configuration
                         prompt_template = config["tools"][name]["prompt"]
+                        
+                        # Determine .gitignore file path
+                        gitignore_path = os.path.join(project_path, '.gitignore')
+                        
                         report_text = prompt_template.format(
                             project_path=project_path,
                             rules_by_category=rules_text,
                             total_rules=total_rules,
-                            categories_count=len(rules_by_category)
+                            categories_count=len(rules_by_category),
+                            gitignore_path=gitignore_path
                         )
                     except Exception as e:
                         logger.error(f"Error analyzing project for gitignore: {str(e)}")
