@@ -100,10 +100,16 @@ You: check test test_validation
 Run the installation script:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mihail-gribov/how_to_do/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mihail-gribov/how_to_do_mcp/main/install.sh | bash
 ```
 
-The script automatically:
+**What happens when you run this command:**
+1. Script downloads and runs immediately
+2. Follows the installation process step by step
+3. Shows progress in real-time
+4. Handles all setup automatically
+
+The script:
 - Downloads the repository from GitHub
 - Installs Python dependencies
 - Configures Cursor IDE
@@ -114,8 +120,8 @@ The script automatically:
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/mihail-gribov/how_to_do.git
-cd how_to_do
+git clone https://github.com/mihail-gribov/how_to_do_mcp.git
+cd how_to_do_mcp
 ```
 
 2. **Ensure files are in the project root:**
@@ -125,7 +131,8 @@ cd how_to_do
 3. **Configure MCP in Cursor:**
    - Open Cursor settings (Ctrl/Cmd + ,)
    - Go to "MCP Servers" section
-   - Add new server: `python3 /path/to/how_to_do.py`
+   - Add new server with **absolute path**: `python3 /home/username/.cursor/tools/how_to_do.py`
+   - **Important:** Use absolute path to the script, not relative
    - Save settings
 
 ### Cursor Setup
@@ -139,7 +146,8 @@ cd how_to_do
 
 3. **Add a new server:**
    - Click "Add Server"
-   - Enter command: `python3 /path/to/how_to_do.py`
+   - Enter command: `python3 /home/username/.cursor/tools/how_to_do.py`
+   - **Important:** Use absolute path to the script, replace `username` with your actual username
    - Specify working directory (optional)
    - Save settings
 
@@ -167,6 +175,25 @@ analyze_function function_name
 # or
 analyze function function_name
 ```
+
+### Explicit Tool Usage
+
+Sometimes Cursor's AI agent may not automatically recognize when to use HOW TO DO tools. In such cases, you can explicitly instruct the agent to use the tool:
+
+**Example:**
+```
+Use how to do: create .gitignore file
+```
+
+**Other examples:**
+```
+Use how to do: check test test_validation
+Use how to do: analyze function process_data
+Use how to do: generate readme
+Use how to do: type analyze for this function
+```
+
+This explicit instruction helps the agent understand that it should use the HOW TO DO MCP server instead of trying to perform the task directly.
 
 ## 📚 Available Commands
 
@@ -205,6 +232,7 @@ Performs comprehensive performance diagnostics of a function.
 
 **Parameters:**
 - `func_name` (required): Function name to analyze
+- **Tip:** If your cursor is positioned inside a function, the agent can automatically detect the function name from the active window
 
 **Analysis includes:**
 - Time complexity (O-notation)
@@ -217,6 +245,10 @@ Performs comprehensive performance diagnostics of a function.
 analyze_function process_large_dataset
 # or
 analyze function process_large_dataset
+# or simply (when cursor is inside a function):
+analyze_function
+# or
+analyze function
 ```
 
 #### `type_analyze`
@@ -273,10 +305,20 @@ create README
 #### `generate_gitignore`
 Creates and updates .gitignore file based on project structure analysis.
 
+**How it works:**
+1. **Scans the project structure** - analyzes all files and directories in your project
+2. **Reads source rules** - loads the initial rule set from `for_gitignore.toml`
+3. **Filters rules** - keeps only rules that match files/directories actually present in your project
+4. **Generates optimized .gitignore** - creates a clean, relevant .gitignore file
+
 **Capabilities:**
 - Automatic file structure analysis
+- Rule filtering based on actual project content
 - Application of rules from for_gitignore.toml
-- Creation of optimized .gitignore
+- Creation of optimized .gitignore with only relevant rules
+
+**Customization:**
+You can extend the `for_gitignore.toml` file with your own rules to match your specific project needs. The tool will automatically include your custom rules in the filtering process.
 
 **Example:**
 ```python

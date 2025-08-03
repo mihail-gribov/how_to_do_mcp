@@ -158,35 +158,35 @@ def generate_commands_list(config):
             continue
             
         command_info = f"**{tool_name}**\n"
-        command_info += f"- Описание: {tool_config['description']}\n"
+        command_info += f"- Description: {tool_config['description']}\n"
         
         if "inputSchema" in tool_config and "properties" in tool_config["inputSchema"]:
             properties = tool_config["inputSchema"]["properties"]
             if properties:
-                command_info += "- Параметры:\n"
+                command_info += "- Parameters:\n"
                 for param_name, param_config in properties.items():
-                    param_desc = param_config.get("description", "Без описания")
+                    param_desc = param_config.get("description", "No description")
                     command_info += f"  - `{param_name}`: {param_desc}\n"
             else:
-                command_info += "- Параметры: нет\n"
+                command_info += "- Parameters: none\n"
         else:
-            command_info += "- Параметры: нет\n"
+            command_info += "- Parameters: none\n"
         
         commands_list.append(command_info)
     
     return "\n".join(commands_list)
 
 def add_how_to_do_signature(prompt_text):
-    """Добавляет стандартную подпись HOW TO DO к промпту"""
-    signature = "\n\nВ конце добавь: \"Выполнена инструкция согласно инструменту HOW TO DO\""
+    """Adds standard HOW TO DO signature to prompt"""
+    signature = "\n\nAt the end add: \"Instruction completed according to HOW TO DO tool\""
     return prompt_text + signature
 
 def log_request(method: str, request_id: Any, params: Dict = None):
-    """Логирует входящий запрос"""
+    """Logs incoming request"""
     logger.debug(f"-> REQUEST: method={method}, id={request_id}, params={params}")
 
 def log_response(method: str, request_id: Any, success: bool = True):
-    """Логирует ответ"""
+    """Logs response"""
     status = "SUCCESS" if success else "ERROR"
     logger.debug(f"<- RESPONSE: method={method}, id={request_id}, status={status}")
 
@@ -260,13 +260,13 @@ def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
             if name in config["tools"]:
                 logger.info(f"Generating prompt for tool: {name}")
                 
-                # Специальная обработка для generate_gitignore
+                # Special handling for generate_gitignore
                 if name == "generate_gitignore":
                     try:
                         project_path = get_project_path()
                         rules_by_category = analyze_project_for_gitignore(project_path)
                         
-                        # Форматируем правила для промпта
+                        # Format rules for prompt
                         rules_text = ""
                         total_rules = 0
                         for category, rules in rules_by_category.items():
@@ -275,7 +275,7 @@ def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
                                 rules_text += f"- {rule}\n"
                             total_rules += len(rules)
                         
-                        # Получаем промпт из конфигурации
+                        # Get prompt from configuration
                         prompt_template = config["tools"][name]["prompt"]
                         report_text = prompt_template.format(
                             project_path=project_path,
@@ -285,11 +285,11 @@ def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
                         )
                     except Exception as e:
                         logger.error(f"Error analyzing project for gitignore: {str(e)}")
-                        report_text = f"❌ Ошибка при анализе проекта для .gitignore: {str(e)}"
+                        report_text = f"❌ Error analyzing project for .gitignore: {str(e)}"
                 else:
                     prompt_template = config["tools"][name]["prompt"]
                     
-                    # Специальная обработка для how_to_do_list
+                    # Special handling for how_to_do_list
                     if name == "how_to_do_list":
                         commands_list = generate_commands_list(config)
                         try:
@@ -305,7 +305,7 @@ def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
                                 }
                             }
                     else:
-                        # Форматируем промпт с переданными аргументами
+                        # Format prompt with passed arguments
                         try:
                             report_text = prompt_template.format(**arguments)
                         except KeyError as e:
@@ -319,7 +319,7 @@ def handle_request(request: Dict[str, Any]) -> Dict[str, Any]:
                                 }
                             }
                 
-                # Добавляем стандартную подпись HOW TO DO
+                # Add standard HOW TO DO signature
                 report_text = add_how_to_do_signature(report_text)
                 
                 response = {

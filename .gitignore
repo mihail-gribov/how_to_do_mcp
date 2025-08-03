@@ -1,2 +1,9 @@
 # IDE
 .cursor/
+
+# Containers_CI
+.github/
+*.yml
+
+# Logs_Tmp
+logs/
