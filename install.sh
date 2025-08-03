@@ -190,11 +190,32 @@ download_project() {
         # Copy files to user's home directory
         print_status $CYAN "Copying files to user directory..."
         mkdir -p "$HOME/.cursor/tools"
+        
+        # Function to check and backup files
+        check_and_backup_file() {
+            local source_file="$1"
+            local target_file="$HOME/.cursor/tools/$2"
+            
+            if [ -f "$target_file" ]; then
+                if cmp -s "$source_file" "$target_file"; then
+                    print_status $CYAN "File $2 is up to date, skipping"
+                else
+                    print_status $YELLOW "File $2 differs, creating backup"
+                    cp "$target_file" "$target_file.backup"
+                    cp "$source_file" "$target_file"
+                    print_status $GREEN "Updated $2 (backup created)"
+                fi
+            else
+                cp "$source_file" "$target_file"
+                print_status $GREEN "Created new file $2"
+            fi
+        }
+        
         cp "how_to_do.py" "$HOME/.cursor/tools/"
-        cp "how_to_do.json" "$HOME/.cursor/tools/"
-        cp "how_to_do_gitignore.toml" "$HOME/.cursor/tools/"
+        check_and_backup_file "how_to_do.json" "how_to_do.json"
+        check_and_backup_file "how_to_do_gitignore.toml" "how_to_do_gitignore.toml"
         chmod +x "$HOME/.cursor/tools/how_to_do.py"
-        print_status $GREEN "Files copied to $HOME/.cursor/tools/"
+        print_status $GREEN "Files processed in $HOME/.cursor/tools/"
     else
         print_status $RED "ERROR: Error downloading repository"
         exit 1

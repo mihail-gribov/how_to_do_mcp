@@ -49,6 +49,78 @@ def get_project_path() -> str:
     
     return os.getcwd()
 
+def check_and_backup_file(file_path: str, new_content: str) -> bool:
+    """
+    Checks if file exists and differs from new content.
+    Creates backup if file exists and differs.
+    Returns True if file was updated, False if no changes needed.
+    """
+    try:
+        file_path = Path(file_path)
+        
+        # Check if file exists
+        if not file_path.exists():
+            logger.info(f"File {file_path} does not exist, will create new")
+            return False
+        
+        # Read existing content
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                existing_content = f.read()
+        except Exception as e:
+            logger.warning(f"Could not read existing file {file_path}: {e}")
+            return False
+        
+        # Compare content
+        if existing_content.strip() == new_content.strip():
+            logger.info(f"File {file_path} is up to date, no changes needed")
+            return False
+        
+        # Content differs, create backup
+        backup_path = file_path.with_suffix(file_path.suffix + '.backup')
+        try:
+            with open(backup_path, 'w', encoding='utf-8') as f:
+                f.write(existing_content)
+            logger.info(f"Created backup: {backup_path}")
+        except Exception as e:
+            logger.error(f"Failed to create backup for {file_path}: {e}")
+            return False
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error checking file {file_path}: {e}")
+        return False
+
+def safe_write_file(file_path: str, content: str) -> bool:
+    """
+    Safely writes content to file with backup creation if needed.
+    Returns True if file was written, False if no changes needed.
+    """
+    try:
+        file_path = Path(file_path)
+        
+        # Check if backup is needed
+        if check_and_backup_file(str(file_path), content):
+            # Write new content
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            logger.info(f"Updated file: {file_path}")
+            return True
+        else:
+            # No changes needed or file doesn't exist
+            if not file_path.exists():
+                # Create new file
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                logger.info(f"Created new file: {file_path}")
+                return True
+            return False
+            
+    except Exception as e:
+        logger.error(f"Error writing file {file_path}: {e}")
+        return False
+
 def load_gitignore_rules() -> Dict[str, List[str]]:
     """Loads rules from how_to_do_gitignore.toml"""
     try:
