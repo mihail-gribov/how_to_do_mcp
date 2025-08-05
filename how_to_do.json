@@ -49,7 +49,7 @@
         "properties": {},
         "additionalProperties": false
       },
-      "prompt": "Check all project tests.\n\nIf the tests didn't start, then analyze why this happened and inform the user.\n\n* Form a summary of test execution results\n\n* Form a report on failed tests, going through each one\n  * Analyze the test and the code it tests\n  * Describe whether the cause of failure is an incorrect test or the code it checks\n  * Suggest solutions for fixing the test (without changing the test and code)\n* Form a plan for fixing tests\n* Save the entire report with plan in a file"
+      "prompt": "ACTIONS:\n1. Run pytest command in terminal with -v flags for verbose output\n2. Collect test execution results\n3. Analyze the results\n\nRESULT ANALYSIS:\n- If tests didn't start: explain the reason and suggest a solution\n- If there are failed tests: for each failed test:\n  * Describe what the test checks\n  * Explain the cause of failure (error in test or in code)\n  * Suggest how to fix it\n- If all tests passed: confirm success\n\nREPORT FORMAT:\n* Brief summary (X passed, Y failed)\n* Detailed analysis of failed tests (if any)\n* Plan for fixing problems\n* Save full report to test_report.txt file\n\nEXECUTE: Run tests and provide analysis according to the instructions above."
     },
     "analyze_function": {
       "description": "Conducts performance diagnostics of a function: analyzes time complexity, memory consumption and suggests optimizations",
