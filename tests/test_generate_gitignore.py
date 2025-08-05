@@ -32,18 +32,13 @@ def test_generate_gitignore():
         response = handle_request(request)
         
         # Проверяем результат
-        if "result" in response:
-            print("✅ Команда generate gitignore работает корректно")
-            print(f"Статус: {response.get('result', {}).get('content', [{}])[0].get('text', '')[:200]}...")
-            return True
-        else:
-            print("❌ Ошибка в команде generate gitignore")
-            print(f"Ошибка: {response.get('error', {})}")
-            return False
+        assert "result" in response, f"Ошибка в команде generate gitignore: {response.get('error', {})}"
+        
+        print("✅ Команда generate gitignore работает корректно")
+        print(f"Статус: {response.get('result', {}).get('content', [{}])[0].get('text', '')[:200]}...")
             
     except Exception as e:
-        print(f"❌ Исключение при выполнении команды: {e}")
-        return False
+        assert False, f"Исключение при выполнении команды: {e}"
 
 def test_load_gitignore_rules():
     """Тест загрузки правил gitignore"""
@@ -57,11 +52,8 @@ def test_load_gitignore_rules():
         for category, patterns in rules.items():
             print(f"  - {category}: {len(patterns)} правил")
         
-        return True
-        
     except Exception as e:
-        print(f"❌ Ошибка загрузки правил gitignore: {e}")
-        return False
+        assert False, f"Ошибка загрузки правил gitignore: {e}"
 
 def test_analyze_project():
     """Тест анализа проекта"""
@@ -78,11 +70,8 @@ def test_analyze_project():
         for category, rules in rules_by_category.items():
             print(f"  - {category}: {len(rules)} правил")
         
-        return True
-        
     except Exception as e:
-        print(f"❌ Ошибка анализа проекта: {e}")
-        return False
+        assert False, f"Ошибка анализа проекта: {e}"
 
 if __name__ == '__main__':
     print("🧪 Тестирование команды generate gitignore...")

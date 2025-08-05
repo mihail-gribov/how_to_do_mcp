@@ -12,9 +12,7 @@ def test_mcp_configuration():
     
     mcp_config_path = os.path.expanduser('~/.cursor/mcp.json')
     
-    if not os.path.exists(mcp_config_path):
-        print("❌ MCP конфигурация не найдена")
-        return False
+    assert os.path.exists(mcp_config_path), "MCP конфигурация не найдена"
     
     try:
         with open(mcp_config_path, 'r') as f:
@@ -29,18 +27,14 @@ def test_mcp_configuration():
                 how_to_do_server = server_config
                 break
         
-        if how_to_do_server:
-            print("✅ HOW TO DO сервер найден в MCP конфигурации")
-            print(f"   Имя: {list(servers.keys())[list(servers.values()).index(how_to_do_server)]}")
-            print(f"   Команда: {how_to_do_server.get('command', 'N/A')}")
-            return True
-        else:
-            print("❌ HOW TO DO сервер не найден в MCP конфигурации")
-            return False
+        assert how_to_do_server is not None, "HOW TO DO сервер не найден в MCP конфигурации"
+        
+        print("✅ HOW TO DO сервер найден в MCP конфигурации")
+        print(f"   Имя: {list(servers.keys())[list(servers.values()).index(how_to_do_server)]}")
+        print(f"   Команда: {how_to_do_server.get('command', 'N/A')}")
             
     except Exception as e:
-        print(f"❌ Ошибка чтения MCP конфигурации: {e}")
-        return False
+        assert False, f"Ошибка чтения MCP конфигурации: {e}"
 
 def test_server_files():
     """Тест файлов сервера"""
@@ -52,30 +46,19 @@ def test_server_files():
     
     for file in required_files:
         file_path = os.path.join(server_dir, file)
-        if os.path.exists(file_path):
-            size = os.path.getsize(file_path)
-            print(f"   ✅ {file} ({size} байт)")
-        else:
-            print(f"   ❌ {file} не найден")
-            return False
-    
-    return True
+        assert os.path.exists(file_path), f"Файл {file} не найден"
+        size = os.path.getsize(file_path)
+        print(f"   ✅ {file} ({size} байт)")
 
 def test_server_executable():
     """Тест исполняемости сервера"""
     
     server_path = os.path.expanduser('~/.cursor/tools/how_to_do.py')
     
-    if not os.path.exists(server_path):
-        print("❌ Сервер не найден")
-        return False
-    
-    if not os.access(server_path, os.X_OK):
-        print("❌ Сервер не исполняемый")
-        return False
+    assert os.path.exists(server_path), "Сервер не найден"
+    assert os.access(server_path, os.X_OK), "Сервер не исполняемый"
     
     print("✅ Сервер исполняемый")
-    return True
 
 def test_generate_gitignore_command():
     """Тест команды generate gitignore"""
@@ -99,24 +82,18 @@ def test_generate_gitignore_command():
         # Обрабатываем запрос
         response = handle_request(request)
         
-        if "result" in response:
-            content = response["result"]["content"][0]["text"]
-            
-            # Проверяем, что ответ содержит правила
-            if "RULES FOR USE" in content and "##" in content:
-                print("✅ Команда generate gitignore возвращает корректный ответ")
-                print(f"   Длина ответа: {len(content)} символов")
-                return True
-            else:
-                print("❌ Команда generate gitignore возвращает некорректный ответ")
-                return False
-        else:
-            print(f"❌ Ошибка команды generate gitignore: {response.get('error', {})}")
-            return False
+        assert "result" in response, f"Ошибка команды generate gitignore: {response.get('error', {})}"
+        
+        content = response["result"]["content"][0]["text"]
+        
+        # Проверяем, что ответ содержит правила
+        assert "RULES FOR USE" in content and "##" in content, "Команда generate gitignore возвращает некорректный ответ"
+        
+        print("✅ Команда generate gitignore возвращает корректный ответ")
+        print(f"   Длина ответа: {len(content)} символов")
             
     except Exception as e:
-        print(f"❌ Ошибка тестирования команды: {e}")
-        return False
+        assert False, f"Ошибка тестирования команды: {e}"
 
 if __name__ == '__main__':
     print("🧪 Тестирование интеграции с Cursor IDE...")
