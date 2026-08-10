@@ -504,6 +504,11 @@ def get_category_description(category: str) -> str:
         "Logs_Tmp": "logs, caches, temporary files",
         "LaTeX_Metadata": "LaTeX / Pandoc artifacts",
         "Documentation": "generated documentation (Sphinx, MkDocs, Hugo and friends)",
+        "Rust": "Rust build output and Cargo artifacts",
+        "DotNet": ".NET build output and tooling files",
+        "Secrets": "credentials and private keys; always included",
+        "AIAgents": "local state and caches left by AI coding assistants",
+        "MachineLearning": "training artefacts and experiment tracking",
         "CustomDiagnostics": "custom templates"
     }
     return descriptions.get(category, "user-defined category")

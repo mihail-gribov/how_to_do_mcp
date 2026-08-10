@@ -183,6 +183,10 @@ def match_pattern(pattern: str, files: Set[str]) -> bool:
     
     return False
 
+# Categories emitted regardless of what the project currently contains
+ALWAYS_INCLUDE = {"Secrets"}
+
+
 def analyze_project_for_gitignore(project_path: str) -> Dict[str, List[str]]:
     """Analyzes the project and returns grouped rules by categories"""
     try:
@@ -204,6 +208,13 @@ def analyze_project_for_gitignore(project_path: str) -> Dict[str, List[str]]:
         needed_rules_by_category = {}
         
         for section_name, patterns in rules.items():
+            # Secrets are included whether or not such a file exists yet: the point
+            # is to ignore the credentials a developer adds tomorrow, not only the
+            # ones already on disk
+            if section_name in ALWAYS_INCLUDE:
+                needed_rules_by_category[section_name] = list(patterns)
+                continue
+            
             section_rules = []
             
             for pattern in patterns:

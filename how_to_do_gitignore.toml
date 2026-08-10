@@ -45,7 +45,7 @@ Python = { patterns = [
   "build/", "dist/", "develop-eggs/", "*.egg-info/", "share/python-wheels/",
   ".tox/", ".nox/", ".coverage", ".coverage.*", "htmlcov/", ".pytest_cache/",
   ".cache/", "*.pylint.d/", ".mypy_cache/", ".pyre/", ".pytype/", ".ruff_cache/",
-  "__pypackages__/", "Pipfile.lock", "poetry.lock",
+  "__pypackages__/",
   ".ipynb_checkpoints/", "profile_default/", "ipython_config.py",
   "docs/_build/"
 ]}
@@ -61,8 +61,9 @@ Java = { patterns = [
 ####################################################################
 # [NodeJS] - Node and frontend build files and directories
 NodeJS = { patterns = [
-  "node_modules/", "package-lock.json", "yarn.lock", "npm-debug.log*", "yarn-error.log*",
+  "node_modules/", "npm-debug.log*", "yarn-error.log*",
   "dist/", "build/", ".cache/", ".parcel-cache/", ".next/", ".nuxt/", ".turbo/",
+  ".svelte-kit/", ".astro/", ".output/", ".vercel/", ".netlify/", ".wrangler/",
   ".pnpm-debug.log", ".pnp.cjs", ".pnp.data.json", "*.tsbuildinfo"
 ]}
 
@@ -96,9 +97,9 @@ Android_iOS = { patterns = [
 ####################################################################
 # [Containers_CI] - Docker, Kubernetes, Terraform, CI/CD artifacts
 Containers_CI = { patterns = [
-  ".env", ".envrc", ".terraform/", "*.tfstate", "*.tfstate.backup", "*.tfvars",
-  ".dockerignore", "**/docker-compose.override.yml", ".helm/", "**/helmfile.d/",
-  "*.kubeconfig", "charts-*.tgz", "docker*.log", "*.log", ".circleci/", ".github/", ".gitlab-ci.yml", "Jenkinsfile", "*.yml"
+  ".terraform/", "*.tfstate", "*.tfstate.backup", "*.tfvars",
+  "**/docker-compose.override.yml", ".helm/", "**/helmfile.d/",
+  "*.kubeconfig", "charts-*.tgz", "docker*.log"
 ]}
 
 ####################################################################
@@ -119,6 +120,37 @@ LaTeX_Metadata = { patterns = [
 # [Documentation] - generated documentation (Sphinx, MkDocs, Hugo and friends)
 Documentation = { patterns = [
   "docs/_build/", "site/", ".next/", "public/", "_site/", ".vuepress/", ".hugo_cache/"
+]}
+
+####################################################################
+# [Secrets] - credentials and private keys; always included
+Secrets = { patterns = [
+  ".env", ".env.*", "!.env.example", "!.env.sample", "!.env.template",
+  ".envrc",                                       # direnv
+  "*.pem", "*.key", "*.p12", "*.pfx", "*.jks",    # keys and keystores
+  "id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", "*.ppk",
+  "credentials.json", "client_secret*.json", "service-account*.json",
+  "secrets.yaml", "secrets.yml", "secrets.json",
+  ".netrc", ".pypirc", ".npmrc",                  # registry auth tokens
+  "*.kdbx",                                       # password databases
+  ".aws/credentials", ".gcloud/", "gha-creds-*.json"
+]}
+
+####################################################################
+# [AIAgents] - local state and caches left by AI coding assistants
+AIAgents = { patterns = [
+  ".claude/settings.local.json", "CLAUDE.local.md",
+  ".cursor/", "*.cursor-workspace",
+  ".aider*", ".continue/", ".windsurf/", ".codeium/", ".specstory/",
+  ".mcp.local.json"
+]}
+
+####################################################################
+# [MachineLearning] - training artefacts and experiment tracking
+MachineLearning = { patterns = [
+  "wandb/", "mlruns/", "lightning_logs/", "outputs/", "checkpoints/",
+  "*.ckpt", "*.safetensors", "*.onnx", "*.pt", "*.pth",
+  ".dvc/cache/", ".neptune/"
 ]}
 
 ####################################################################
