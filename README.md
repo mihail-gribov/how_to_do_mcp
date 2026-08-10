@@ -1,24 +1,57 @@
-## HOW TO DO — Enhanced Control Over Cursor AI Agent
+# HOW TO DO — engineering procedures for coding agents
 
-Cursor is a powerful AI-powered development environment, but sometimes its agent can be overly proactive: it writes excessive explanations, unexpectedly starts coding, or edits more files than necessary.
+A small library of procedures an AI coding agent runs on demand: check a test and
+report why it fails, diagnose a function's performance, add type annotations,
+write a README, build a `.gitignore` from what the project actually contains.
 
-The **HOW TO DO** extension allows you to control Cursor's AI agent more precisely by linking short commands with detailed prompts that clearly define what the agent should accomplish.
+Each procedure is available two ways, from one source of truth
+([`how_to_do.json`](how_to_do.json)):
 
-### Key Benefits:
-
-* 🔹 **Precise Instructions:** Clearly specify what the agent should do (e.g., "check tests", "create .gitignore", "only analyze function").
-* 🔹 **Predictable Actions:** Reduce the likelihood of unexpected edits and make the agent's behavior more stable.
-* 🔹 **AI Workflow Optimization:** Reduce token usage through concise and clear instructions, lowering costs and improving performance.
-
-Using **HOW TO DO**, you can work with Cursor more efficiently and avoid unwanted surprises in your code.
+- **as a skill** — [`skills/`](skills/) holds a `SKILL.md` per procedure. Drop them
+  into an agent that loads skills and no server is involved.
+- **as an MCP server** — [`how_to_do.py`](how_to_do.py) serves the same procedures
+  over the Model Context Protocol to any MCP client.
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-orange.svg)](https://modelcontextprotocol.io)
-[![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)](https://github.com/mihail-gribov/how_to_do)
+
+## The .gitignore builder
+
+The one procedure that is more than a prompt. It scans the project, matches it
+against a rule set of 18 categories, merges in your own rules and emits only the
+patterns that apply:
+
+```bash
+python3 scripts/gitignore_rules.py            # this project
+python3 scripts/gitignore_rules.py /path --json
+```
+
+**Secrets are always included**, whether or not such a file exists yet — the point
+is to ignore the `.env` a developer adds tomorrow, not only the one already on
+disk. `.env.example`, `.env.sample` and `.env.template` stay tracked.
+
+Rules live in [`how_to_do_gitignore.toml`](how_to_do_gitignore.toml); your own
+additions go to `~/.cursor/tools/how_to_do_gitignore.toml` and take precedence.
+The format is described in [`docs/gitignore_toml_format.md`](docs/gitignore_toml_format.md).
+
+## Using the skills
+
+```bash
+cp -r skills/* <your-agent-skills-directory>/
+```
+
+Skills are generated, not hand-written. Edit `how_to_do.json`, then:
+
+```bash
+python3 scripts/generate_skills.py          # regenerate
+python3 scripts/generate_skills.py --check  # verify they are in sync (the test suite runs this)
+```
 
 ## 📋 Table of Contents
 
+- [The .gitignore builder](#the-gitignore-builder)
+- [Using the skills](#using-the-skills)
 - [🎯 What HOW TO DO Solves](#-what-how-to-do-solves)
 - [⚙️ How It Works](#️-how-it-works)
 - [🚀 Quick Start](#-quick-start)
