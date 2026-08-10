@@ -219,10 +219,6 @@ download_project() {
                 print_status $YELLOW "User gitignore.toml found, performing merge..."
                 
                 # Try to merge using Python script with optimized I/O
-                # First, copy installer.py to current directory if it exists in the original location
-                if [ -f "/home/mike/Projects/how_to_do/installer.py" ]; then
-                    cp "/home/mike/Projects/how_to_do/installer.py" .
-                fi
                 
                 if python3 -c "
 import sys
@@ -231,7 +227,7 @@ sys.path.insert(0, os.getcwd())
 from installer import merge_gitignore_toml_files, save_merged_gitignore_toml
 
 try:
-    # Оптимизированный мерж с минимальными I/O операциями
+    # Optimized merge with minimal I/O
     merged_data = merge_gitignore_toml_files('$source_file', '$target_file')
     if save_merged_gitignore_toml(merged_data, '$target_file'):
         print('Merge successful')
