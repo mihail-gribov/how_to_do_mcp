@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-Тест для проверки команды generate gitignore
+Test for the generate gitignore command
 """
 
 import json
 import sys
 import os
 
-# Добавляем путь к установленному серверу
+# Add the path to the installed server
 sys.path.insert(0, os.path.expanduser('~/.cursor/tools'))
 
 def test_generate_gitignore():
-    """Тест команды generate gitignore"""
+    """The generate gitignore command"""
     
-    # Создаем тестовый запрос
+    # Create a test request
     request = {
         "jsonrpc": "2.0",
         "id": 1,
@@ -25,75 +25,75 @@ def test_generate_gitignore():
     }
     
     try:
-        # Импортируем функцию обработки запросов
+        # Import the request handler
         from how_to_do import handle_request
         
-        # Обрабатываем запрос
+        # Handle the request
         response = handle_request(request)
         
-        # Проверяем результат
-        assert "result" in response, f"Ошибка в команде generate gitignore: {response.get('error', {})}"
+        # Check the result
+        assert "result" in response, f"generate gitignore failed: {response.get('error', {})}"
         
-        print("✅ Команда generate gitignore работает корректно")
-        print(f"Статус: {response.get('result', {}).get('content', [{}])[0].get('text', '')[:200]}...")
+        print("✅ generate gitignore works correctly")
+        print(f"Status: {response.get('result', {}).get('content', [{}])[0].get('text', '')[:200]}...")
             
     except Exception as e:
-        assert False, f"Исключение при выполнении команды: {e}"
+        assert False, f"Exception while running the command: {e}"
 
 def test_load_gitignore_rules():
-    """Тест загрузки правил gitignore"""
+    """Loading gitignore rules"""
     
     try:
         from how_to_do import load_gitignore_rules
         
         rules = load_gitignore_rules()
-        print(f"✅ Правила gitignore загружены: {len(rules)} категорий")
+        print(f"✅ Gitignore rules loaded: {len(rules)} categories")
         
         for category, patterns in rules.items():
-            print(f"  - {category}: {len(patterns)} правил")
+            print(f"  - {category}: {len(patterns)} rules")
         
     except Exception as e:
-        assert False, f"Ошибка загрузки правил gitignore: {e}"
+        assert False, f"Failed to load gitignore rules: {e}"
 
 def test_analyze_project():
-    """Тест анализа проекта"""
+    """Project analysis"""
     
     try:
         from how_to_do import analyze_project_for_gitignore, get_project_path
         
         project_path = get_project_path()
-        print(f"📁 Анализируем проект: {project_path}")
+        print(f"📁 Analysing project: {project_path}")
         
         rules_by_category = analyze_project_for_gitignore(project_path)
-        print(f"✅ Анализ проекта завершен: {len(rules_by_category)} категорий")
+        print(f"✅ Project analysed: {len(rules_by_category)} categories")
         
         for category, rules in rules_by_category.items():
-            print(f"  - {category}: {len(rules)} правил")
+            print(f"  - {category}: {len(rules)} rules")
         
     except Exception as e:
-        assert False, f"Ошибка анализа проекта: {e}"
+        assert False, f"Project analysis failed: {e}"
 
 if __name__ == '__main__':
-    print("🧪 Тестирование команды generate gitignore...")
+    print("🧪 Testing the generate gitignore command...")
     print()
     
-    # Тест 1: Загрузка правил
-    print("1. Тест загрузки правил gitignore:")
+    # Test 1: loading the rules
+    print("1. Loading gitignore rules:")
     test1 = test_load_gitignore_rules()
     print()
     
-    # Тест 2: Анализ проекта
-    print("2. Тест анализа проекта:")
+    # Test 2: project analysis
+    print("2. Project analysis:")
     test2 = test_analyze_project()
     print()
     
-    # Тест 3: Команда generate gitignore
-    print("3. Тест команды generate gitignore:")
+    # Test 3: the generate gitignore command
+    print("3. The generate gitignore command:")
     test3 = test_generate_gitignore()
     print()
     
-    # Итоговый результат
+    # Final result
     if test1 and test2 and test3:
-        print("🎉 Все тесты прошли успешно!")
+        print("🎉 All tests passed!")
     else:
-        print("❌ Некоторые тесты не прошли") 
+        print("❌ Some tests failed") 

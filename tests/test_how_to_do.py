@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Тесты для how_to_do.py после рефакторинга
+Tests for how_to_do.py after the refactoring
 """
 
 import unittest
@@ -8,7 +8,7 @@ import tempfile
 import os
 import json
 
-# Импортируем функции для тестирования
+# Import the functions under test
 from how_to_do import (
     load_config,
     get_project_path,
@@ -21,13 +21,13 @@ from how_to_do import (
 
 
 class TestHowToDo(unittest.TestCase):
-    """Тесты для функций how_to_do.py"""
+    """Tests for how_to_do.py functions"""
     
     def setUp(self):
-        """Настройка тестов"""
+        """Set up the tests"""
         self.temp_dir = tempfile.mkdtemp()
         
-        # Создаем временный конфигурационный файл
+        # Create a temporary configuration file
         self.config_file = os.path.join(self.temp_dir, "how_to_do.json")
         config_data = {
             "commands": [
@@ -42,23 +42,23 @@ class TestHowToDo(unittest.TestCase):
             json.dump(config_data, f)
     
     def tearDown(self):
-        """Очистка после тестов"""
+        """Clean up after the tests"""
         import shutil
         shutil.rmtree(self.temp_dir)
     
     def test_load_config(self):
-        """Тест load_config"""
-        # Временно изменяем __file__ для тестирования
+        """load_config"""
+        # Temporarily change __file__ for the test
         import how_to_do
         original_file = how_to_do.__file__
         
         try:
-            # Создаем временный файл how_to_do.py
+            # Create a temporary how_to_do.py
             temp_how_to_do = os.path.join(self.temp_dir, "how_to_do.py")
             with open(temp_how_to_do, 'w') as f:
                 f.write("# Test file")
     
-            # Создаем временный файл how_to_do.json
+            # Create a temporary how_to_do.json
             temp_json = os.path.join(self.temp_dir, "how_to_do.json")
             test_config = {
                 "tools": {
@@ -75,25 +75,25 @@ class TestHowToDo(unittest.TestCase):
             with open(temp_json, 'w') as f:
                 json.dump(test_config, f)
     
-            # Временно заменяем __file__
+            # Temporarily replace __file__
             how_to_do.__file__ = temp_how_to_do
     
-            # Тестируем загрузку конфигурации
+            # Exercise configuration loading
             config = load_config()
             self.assertIsInstance(config, dict)
             self.assertIn("tools", config)
             
         finally:
-            # Восстанавливаем оригинальный __file__
+            # Restore the original __file__
             how_to_do.__file__ = original_file
     
     def test_get_project_path(self):
-        """Тест get_project_path"""
-        # Сохраняем оригинальное значение переменной окружения
+        """get_project_path"""
+        # Save the original environment variable
         original_project_path = os.environ.get('PROJECT_PATH')
         
         try:
-            # Тест без переменной окружения
+            # Test without the environment variable
             if 'PROJECT_PATH' in os.environ:
                 del os.environ['PROJECT_PATH']
             
@@ -101,22 +101,22 @@ class TestHowToDo(unittest.TestCase):
             self.assertIsInstance(path, str)
             self.assertTrue(len(path) > 0)
             
-            # Тест с переменной окружения
+            # Test with the environment variable
             test_path = "/test/path"
             os.environ['PROJECT_PATH'] = test_path
             path = get_project_path()
             self.assertEqual(path, test_path)
             
         finally:
-            # Восстанавливаем оригинальное значение
+            # Restore the original value
             if original_project_path:
                 os.environ['PROJECT_PATH'] = original_project_path
             elif 'PROJECT_PATH' in os.environ:
                 del os.environ['PROJECT_PATH']
     
     def test_scan_project_files(self):
-        """Тест scan_project_files"""
-        # Создаем тестовые файлы
+        """scan_project_files"""
+        # Create the test files
         test_files = [
             "test.py",
             "test.txt",
@@ -130,34 +130,34 @@ class TestHowToDo(unittest.TestCase):
             with open(full_path, 'w') as f:
                 f.write("test content")
         
-        # Сканируем файлы
+        # Scan the files
         files = scan_project_files(self.temp_dir)
         self.assertIsInstance(files, set)
         self.assertTrue(len(files) > 0)
         
-        # Проверяем, что все файлы найдены (функция возвращает относительные пути)
-        # Проверяем только созданные нами файлы, игнорируя другие
+        # Every file must be found (the function returns relative paths)
+        # Check only the files we created, ignore the rest
         for test_file in test_files:
             self.assertIn(test_file, files)
     
     def test_match_pattern(self):
-        """Тест match_pattern"""
+        """match_pattern"""
         files = {
             "/path/to/file.py",
             "/path/to/file.txt",
             "/path/to/subdir/file.py"
         }
         
-        # Тест с паттерном, который должен совпадать
+        # Pattern that should match
         result = match_pattern("*.py", files)
         self.assertTrue(result)
         
-        # Тест с паттерном, который не должен совпадать
+        # Pattern that should not match
         result = match_pattern("*.java", files)
         self.assertFalse(result)
     
     def test_generate_commands_list(self):
-        """Тест generate_commands_list"""
+        """generate_commands_list"""
         config = {
             "tools": {
                 "test_command": {
@@ -177,13 +177,13 @@ class TestHowToDo(unittest.TestCase):
         self.assertIsInstance(commands, str)
         self.assertTrue(len(commands) > 0)
         
-        # Проверяем содержимое
+        # Check the content
         self.assertIn("test_command", commands)
         self.assertIn("Test command", commands)
         self.assertIn("param1", commands)
     
     def test_add_how_to_do_signature(self):
-        """Тест add_how_to_do_signature"""
+        """add_how_to_do_signature"""
         prompt = "Test prompt"
         result = add_how_to_do_signature(prompt)
         

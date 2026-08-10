@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Тест для проверки работы install.sh с installer.py
+Test that install.sh works with installer.py
 """
 
 import unittest
@@ -10,13 +10,13 @@ import subprocess
 import shutil
 
 class TestInstallScript(unittest.TestCase):
-    """Тесты для проверки работы install.sh"""
+    """Tests for install.sh"""
     
     def setUp(self):
-        """Настройка тестов"""
+        """Set up the tests"""
         self.temp_dir = tempfile.mkdtemp()
         
-        # Создаем тестовые файлы
+        # Create the test files
         self.test_files = {
             "how_to_do.py": "# Test how_to_do.py\n",
             "installer.py": "# Test installer.py\n", 
@@ -29,15 +29,15 @@ class TestInstallScript(unittest.TestCase):
                 f.write(content)
     
     def tearDown(self):
-        """Очистка после тестов"""
+        """Clean up after the tests"""
         shutil.rmtree(self.temp_dir)
     
     def test_installer_imports_correctly(self):
-        """Тест, что installer.py импортируется корректно"""
-        # Копируем installer.py в тестовую директорию
+        """installer.py imports cleanly"""
+        # Copy installer.py into the test directory
         shutil.copy("installer.py", self.temp_dir)
         
-        # Проверяем, что installer.py работает
+        # installer.py must work
         result = subprocess.run(
             ["python3", "-c", "import installer; print('OK')"],
             cwd=self.temp_dir,
@@ -49,11 +49,11 @@ class TestInstallScript(unittest.TestCase):
         self.assertIn("OK", result.stdout)
     
     def test_installer_functions_available(self):
-        """Тест, что функции installer.py доступны"""
-        # Копируем installer.py в тестовую директорию
+        """installer.py functions are available"""
+        # Copy installer.py into the test directory
         shutil.copy("installer.py", self.temp_dir)
         
-        # Проверяем импорт функций
+        # Check that the functions import
         test_code = """
 import installer
 from installer import (
@@ -80,7 +80,7 @@ print('All functions imported successfully')
         self.assertIn("All functions imported successfully", result.stdout)
     
     def test_install_script_syntax(self):
-        """Тест синтаксиса install.sh"""
+        """install.sh syntax"""
         result = subprocess.run(
             ["bash", "-n", "install.sh"],
             capture_output=True,
@@ -90,16 +90,16 @@ print('All functions imported successfully')
         self.assertEqual(result.returncode, 0, f"install.sh syntax error: {result.stderr}")
     
     def test_installer_independent_of_how_to_do(self):
-        """Тест, что installer.py работает независимо от how_to_do.py"""
-        # Копируем только installer.py
+        """installer.py works independently of how_to_do.py"""
+        # Copy installer.py only
         shutil.copy("installer.py", self.temp_dir)
         
-        # Проверяем, что installer.py работает без how_to_do.py
+        # installer.py must work without how_to_do.py
         test_code = """
 import installer
 from installer import check_and_backup_file, safe_write_file
 
-# Тестируем функции
+# Exercise the functions
 result = check_and_backup_file("test.txt", "test content")
 print(f'check_and_backup_file result: {result}')
 

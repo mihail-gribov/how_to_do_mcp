@@ -250,7 +250,7 @@ def generate_commands_list(config):
 def add_how_to_do_signature(prompt_text):
     """Adds standard HOW TO DO signature to prompt"""
     signature = "\n\nAt the end add: \"Instruction completed according to HOW TO DO tool\""
-    instruction = "\n\nПроверь, что ты точно следуешь инструкции."
+    instruction = "\n\nCheck that you are following the instruction exactly."
     return prompt_text + signature + instruction
 
 def log_request(method: str, request_id: Any, params: Dict = None):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Интеграционные тесты для проверки совместной работы installer.py и how_to_do.py
+Integration tests covering installer.py and how_to_do.py working together
 """
 
 import unittest
@@ -8,7 +8,7 @@ import tempfile
 import os
 import shutil
 
-# Импортируем функции для тестирования
+# Import the functions under test
 from installer import (
     check_and_backup_file,
     safe_write_file,
@@ -30,17 +30,17 @@ from how_to_do import (
 
 
 class TestIntegration(unittest.TestCase):
-    """Интеграционные тесты"""
+    """Integration tests"""
     
     def setUp(self):
-        """Настройка тестов"""
+        """Set up the tests"""
         self.temp_dir = tempfile.mkdtemp()
         
-        # Создаем тестовые TOML файлы
+        # Create the test TOML files
         self.distributor_toml = os.path.join(self.temp_dir, "distributor.toml")
         self.user_toml = os.path.join(self.temp_dir, "user.toml")
         
-        # Создаем дистрибутивный TOML файл
+        # Create the distributed TOML file
         distributor_content = """# Distributor TOML file
 Python = { patterns = [
     "*.py",
@@ -56,10 +56,10 @@ Java = { patterns = [
         with open(self.distributor_toml, 'w') as f:
             f.write(distributor_content)
         
-        # Создаем пользовательский TOML файл
+        # Create the user TOML file
         user_content = """# User TOML file
 Python = { patterns = [
-    "*.pyc",  # Дубликат
+    "*.pyc",  # duplicate
     "*.pyo",
     "venv/"
 ]}
@@ -72,21 +72,21 @@ Custom = { patterns = [
             f.write(user_content)
     
     def tearDown(self):
-        """Очистка после тестов"""
+        """Clean up after the tests"""
         shutil.rmtree(self.temp_dir)
     
     def test_merge_gitignore_toml_files_integration(self):
-        """Тест интеграции merge_gitignore_toml_files"""
-        # Объединяем файлы
+        """merge_gitignore_toml_files integration"""
+        # Merge the files
         result = merge_gitignore_toml_files(self.distributor_toml, self.user_toml)
         
-        # Проверяем результат
+        # Check the result
         self.assertIsInstance(result, dict)
         self.assertIn("Python", result)
         self.assertIn("Java", result)
         self.assertIn("Custom", result)
         
-        # Проверяем, что дубликаты удалены
+        # Duplicates must be removed
         python_patterns = result["Python"]
         self.assertIn("*.py", python_patterns)
         self.assertIn("*.pyc", python_patterns)
@@ -94,24 +94,24 @@ Custom = { patterns = [
         self.assertIn("*.pyo", python_patterns)
         self.assertIn("venv/", python_patterns)
         
-        # Проверяем, что дубликат *.pyc не повторяется
+        # The *.pyc duplicate must not repeat
         pyc_count = python_patterns.count("*.pyc")
         self.assertEqual(pyc_count, 1)
     
     def test_save_and_load_integration(self):
-        """Тест интеграции сохранения и загрузки TOML файла"""
-        # Объединяем файлы
+        """Saving and loading a TOML file"""
+        # Merge the files
         merged_data = merge_gitignore_toml_files(self.distributor_toml, self.user_toml)
         
-        # Сохраняем результат
+        # Save the result
         output_file = os.path.join(self.temp_dir, "merged.toml")
         success = save_merged_gitignore_toml(merged_data, output_file)
         self.assertTrue(success)
         
-        # Проверяем, что файл создан
+        # The file must have been created
         self.assertTrue(os.path.exists(output_file))
         
-        # Читаем файл и проверяем содержимое
+        # Read the file and check its content
         with open(output_file, 'r') as f:
             content = f.read()
         
@@ -123,31 +123,31 @@ Custom = { patterns = [
         self.assertIn("custom_file.txt", content)
     
     def test_deduplicate_patterns_integration(self):
-        """Тест интеграции deduplicate_patterns"""
+        """deduplicate_patterns integration"""
         patterns = [
             "*.py",
             "*.pyc",
-            "*.py",  # Дубликат
-            "*.pyc",  # Дубликат
+            "*.py",  # duplicate
+            "*.pyc",  # duplicate
             "*.log",
-            "*.py # python files",  # С комментарием
-            "*.py # another comment"  # Дубликат с комментарием
+            "*.py # python files",  # with a comment
+            "*.py # another comment"  # duplicate with a comment
         ]
         
         result = deduplicate_patterns(patterns)
         
-        # Проверяем, что дубликаты удалены
+        # Duplicates must be removed
         self.assertIn("*.py", result)
         self.assertIn("*.pyc", result)
         self.assertIn("*.log", result)
         
-        # Проверяем, что дубликаты не повторяются
+        # Duplicates must not repeat
         self.assertEqual(result.count("*.py"), 1)
         self.assertEqual(result.count("*.pyc"), 1)
     
     def test_validate_merged_toml_structure_integration(self):
-        """Тест интеграции validate_merged_toml_structure"""
-        # Валидная структура
+        """validate_merged_toml_structure integration"""
+        # Valid structure
         valid_data = {
             "Python": ["*.py", "*.pyc"],
             "Java": ["*.class", "*.jar"]
@@ -155,57 +155,57 @@ Custom = { patterns = [
         result = validate_merged_toml_structure(valid_data)
         self.assertTrue(result)
         
-        # Невалидная структура
+        # Invalid structure
         invalid_data = {
-            "Python": "*.py",  # Должен быть список
+            "Python": "*.py",  # must be a list
             "Java": ["*.class", "*.jar"]
         }
         result = validate_merged_toml_structure(invalid_data)
         self.assertFalse(result)
     
     def test_get_category_description_integration(self):
-        """Тест интеграции get_category_description"""
-        # Известные категории
+        """get_category_description integration"""
+        # Known categories
         result = get_category_description("Python")
         self.assertIn("Python", result)
         
         result = get_category_description("Java")
         self.assertIn("JVM", result)
         
-        # Неизвестная категория
+        # Unknown category
         result = get_category_description("UnknownCategory")
-        self.assertEqual(result, "пользовательская категория")
+        self.assertEqual(result, "user-defined category")
     
     def test_file_operations_integration(self):
-        """Тест интеграции операций с файлами"""
+        """File operations integration"""
         test_file = os.path.join(self.temp_dir, "test.txt")
         content = "test content"
         
-        # Создаем файл
+        # Create the file
         result = safe_write_file(test_file, content)
         self.assertTrue(result)
         self.assertTrue(os.path.exists(test_file))
         
-        # Читаем файл
+        # Read the file
         with open(test_file, 'r') as f:
             file_content = f.read()
         self.assertEqual(file_content, content)
         
-        # Изменяем файл
+        # Modify the file
         new_content = "new content"
         result = safe_write_file(test_file, new_content)
         self.assertTrue(result)
         
-        # Проверяем, что бэкап создан
+        # A backup must have been created
         backup_file = test_file + '.backup'
         self.assertTrue(os.path.exists(backup_file))
         
-        # Проверяем содержимое бэкапа
+        # Check the backup content
         with open(backup_file, 'r') as f:
             backup_content = f.read()
         self.assertEqual(backup_content, content)
         
-        # Проверяем новое содержимое
+        # Check the new content
         with open(test_file, 'r') as f:
             new_file_content = f.read()
         self.assertEqual(new_file_content, new_content)

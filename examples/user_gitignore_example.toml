@@ -1,11 +1,11 @@
-# Пример пользовательского файла gitignore.toml
-# Расположение: ~/.cursor/tools/how_to_do_gitignore.toml
+# Example of a user gitignore.toml
+# Location: ~/.cursor/tools/how_to_do_gitignore.toml
 # 
-# Этот файл автоматически мержится с дистрибутивным файлом при установке
-# Ваши правила имеют приоритет над дистрибутивными
+# This file is merged with the distributed one at install time
+# Your rules take precedence over the distributed ones
 
 ####################################################################
-# [IDE] — дополнительные редакторы и IDE
+# [IDE] - extra editors and IDEs
 IDE = { patterns = [
   ".vscode/",            # Visual Studio Code
   ".sublime-project",    # Sublime Text
@@ -18,7 +18,7 @@ IDE = { patterns = [
 ]}
 
 ####################################################################
-# [Python] — дополнительные Python правила
+# [Python] - extra Python rules
 Python = { patterns = [
   "venv/",               # virtual environments
   "pip-wheel-metadata/", # pip metadata
@@ -45,17 +45,17 @@ Python = { patterns = [
 ]}
 
 ####################################################################
-# [CustomProject] — специфичные для вашего проекта правила
+# [CustomProject] - rules specific to your project
 CustomProject = { patterns = [
-  "config/local.json",   # локальные настройки
-  "logs/",               # логи приложения
-  "temp/",               # временные файлы
-  "cache/",              # кэш приложения
-  "uploads/",            # загруженные файлы
-  "backups/",            # резервные копии
-  "*.log",               # лог файлы
-  "*.tmp",               # временные файлы
-  "*.bak",               # резервные файлы
+  "config/local.json",   # local settings
+  "logs/",               # application logs
+  "temp/",               # temporary files
+  "cache/",              # application cache
+  "uploads/",            # uploaded files
+  "backups/",            # backups
+  "*.log",               # log files
+  "*.tmp",               # temporary files
+  "*.bak",               # backup files
   "*.swp",               # vim swap files
   "*.swo",               # vim swap files
   "*~",                  # backup files
@@ -65,7 +65,7 @@ CustomProject = { patterns = [
 ]}
 
 ####################################################################
-# [Database] — файлы баз данных
+# [Database] - database files
 Database = { patterns = [
   "*.db",                # SQLite databases
   "*.sqlite",            # SQLite databases
@@ -80,7 +80,7 @@ Database = { patterns = [
 ]}
 
 ####################################################################
-# [Secrets] — секретные файлы и ключи
+# [Secrets] - secrets and keys
 Secrets = { patterns = [
   ".env",                # environment variables
   ".env.local",          # local environment
@@ -103,7 +103,7 @@ Secrets = { patterns = [
 ]}
 
 ####################################################################
-# [BuildOutput] — результаты сборки
+# [BuildOutput] - build output
 BuildOutput = { patterns = [
   "dist/",               # distribution files
   "build/",              # build files
@@ -135,9 +135,9 @@ BuildOutput = { patterns = [
   "*.rar"                # compressed files
 ]}
 
-# Примечания:
-# 1. Этот файл автоматически мержится с дистрибутивным файлом
-# 2. Ваши правила имеют приоритет над дистрибутивными
-# 3. Дубликаты автоматически удаляются
-# 4. Новые категории добавляются к существующим
-# 5. При обновлении инструмента ваши правила сохраняются 
+# Notes:
+# 1. This file is merged with the distributed one automatically
+# 2. Your rules take precedence over the distributed ones
+# 3. Duplicates are removed automatically
+# 4. New categories are appended to the existing ones
+# 5. Your rules survive tool upgrades 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-HOW TO DO Installer - инсталляционные функции для проекта
+HOW TO DO Installer - installation helpers for the project
 
-Этот файл содержит функции для установки и настройки проекта,
-включая работу с gitignore файлами, создание бэкапов и валидацию.
+This module holds the functions that install and configure the project,
+including gitignore handling, backups and validation.
 """
 
 import os
@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List
 
-# Настройка логирования
+# Logging setup
 import logging
 import sys
 
@@ -29,26 +29,26 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# Кэш для результатов мержа
+# Cache for merge results
 _merge_cache = {}
 _cache_timestamp = None
-_cache_duration = timedelta(minutes=5)  # Кэш на 5 минут
+_cache_duration = timedelta(minutes=5)  # five-minute cache
 
 def _is_cache_valid() -> bool:
-    """Проверяет, действителен ли кэш"""
+    """Return True if the cache is still valid"""
     global _cache_timestamp
     if _cache_timestamp is None:
         return False
     return datetime.now() - _cache_timestamp < _cache_duration
 
 def _clear_cache():
-    """Очищает кэш"""
+    """Clear the cache"""
     global _merge_cache, _cache_timestamp
     _merge_cache = {}
     _cache_timestamp = None
 
 def _update_cache(data: Dict[str, List[str]]):
-    """Обновляет кэш"""
+    """Refresh the cache"""
     global _merge_cache, _cache_timestamp
     _merge_cache = data.copy()
     _cache_timestamp = datetime.now()
@@ -76,11 +76,11 @@ def get_project_path() -> str:
 def load_gitignore_rules() -> Dict[str, List[str]]:
     """Loads rules from how_to_do_gitignore.toml (already merged during installation)"""
     try:
-        # Загружаем готовый мерженный файл из tools директории
+        # Load the pre-merged file from the tools directory
         rules_path = os.path.join(os.path.expanduser('~'), '.cursor', 'tools', 'how_to_do_gitignore.toml')
         
         if not os.path.exists(rules_path):
-            # Fallback к дистрибутивному файлу если мерженный не найден
+            # Fall back to the distributed file if no merged one exists
             distributor_path = os.path.join(os.path.dirname(__file__), 'how_to_do_gitignore.toml')
             if os.path.exists(distributor_path):
                 logger.warning("Merged gitignore.toml not found, using distributor file")
@@ -107,11 +107,11 @@ def load_gitignore_rules() -> Dict[str, List[str]]:
 def load_gitignore_rules() -> Dict[str, List[str]]:
     """Loads rules from how_to_do_gitignore.toml (already merged during installation)"""
     try:
-        # Загружаем готовый мерженный файл из tools директории
+        # Load the pre-merged file from the tools directory
         rules_path = os.path.join(os.path.expanduser('~'), '.cursor', 'tools', 'how_to_do_gitignore.toml')
         
         if not os.path.exists(rules_path):
-            # Fallback к дистрибутивному файлу если мерженный не найден
+            # Fall back to the distributed file if no merged one exists
             distributor_path = os.path.join(os.path.dirname(__file__), 'how_to_do_gitignore.toml')
             if os.path.exists(distributor_path):
                 logger.warning("Merged gitignore.toml not found, using distributor file")
@@ -211,23 +211,23 @@ def safe_write_file(file_path: str, content: str) -> bool:
 
 def merge_gitignore_toml_files(distributor_path: str, user_path: str) -> Dict[str, List[str]]:
     """
-    Объединяет правила из дистрибутивного и пользовательского TOML файлов.
-    Оптимизирован для работы с большими файлами.
+    Merge rules from the distributed and user TOML files.
+    Optimised for large files.
     
     Args:
-        distributor_path: Путь к файлу из дистрибутива
-        user_path: Путь к пользовательскому файлу
+        distributor_path: path to the distributed file
+        user_path: path to the user file
         
     Returns:
-        Объединенный словарь категорий и правил
+        Merged mapping of categories to rules
     """
     try:
-        # Проверяем существование дистрибутивного файла
+        # Check that the distributed file exists
         if not os.path.exists(distributor_path):
             logger.error(f"Distributor file not found: {distributor_path}")
             raise FileNotFoundError(f"Distributor file not found: {distributor_path}")
         
-        # Загружаем дистрибутивный файл
+        # Load the distributed file
         try:
             with open(distributor_path, 'rb') as f:
                 distributor_data = tomllib.load(f)
@@ -235,7 +235,7 @@ def merge_gitignore_toml_files(distributor_path: str, user_path: str) -> Dict[st
             logger.error(f"Failed to parse distributor TOML file: {str(e)}")
             raise RuntimeError(f"Invalid distributor TOML file: {str(e)}")
         
-        # Загружаем пользовательский файл (если существует)
+        # Load the user file if present
         user_data = {}
         if os.path.exists(user_path):
             try:
@@ -244,35 +244,35 @@ def merge_gitignore_toml_files(distributor_path: str, user_path: str) -> Dict[st
                 logger.info(f"Loaded user TOML file: {user_path}")
             except Exception as e:
                 logger.warning(f"Failed to parse user TOML file, skipping: {str(e)}")
-                # Продолжаем с пустым пользовательским файлом
+                # Continue with an empty user file
                 user_data = {}
         else:
             logger.info("User TOML file not found, using distributor file only")
         
-        # Объединяем данные с оптимизацией памяти
+        # Merge the data with memory use in mind
         merged_data = {}
         
-        # Сначала добавляем все категории из дистрибутивного файла
+        # Start with every category from the distributed file
         for section_name, section_data in distributor_data.items():
             if isinstance(section_data, dict) and 'patterns' in section_data:
-                # Используем копию для экономии памяти
+                # Copy to save memory
                 merged_data[section_name] = section_data['patterns'][:]
             else:
                 logger.warning(f"Skipping invalid section in distributor file: {section_name}")
         
-        # Затем добавляем/обновляем категории из пользовательского файла
+        # Then add or update categories from the user file
         for section_name, section_data in user_data.items():
             if isinstance(section_data, dict) and 'patterns' in section_data:
                 if section_name in merged_data:
-                    # Объединяем правила, убирая дубликаты
-                    # Используем extend для экономии памяти
+                    # Merge the rules, dropping duplicates
+                    # extend() keeps memory use down
                     merged_patterns = deduplicate_patterns(
                         section_data['patterns'] + merged_data[section_name]
                     )
                     merged_data[section_name] = merged_patterns
                     logger.debug(f"Merged category {section_name}: {len(merged_patterns)} patterns")
                 else:
-                    # Новая категория - добавляем как есть
+                    # New category: take it as is
                     merged_data[section_name] = section_data['patterns'][:]
                     logger.debug(f"Added new category {section_name}: {len(section_data['patterns'])} patterns")
             else:
@@ -280,7 +280,7 @@ def merge_gitignore_toml_files(distributor_path: str, user_path: str) -> Dict[st
         
         logger.info(f"Merged gitignore rules: {len(merged_data)} categories")
         
-        # Валидируем структуру после мержа
+        # Validate the structure after merging
         if not validate_merged_toml_structure(merged_data):
             logger.error("Merged data structure validation failed")
             raise RuntimeError("Invalid merged TOML structure")
@@ -289,7 +289,7 @@ def merge_gitignore_toml_files(distributor_path: str, user_path: str) -> Dict[st
         
     except Exception as e:
         logger.error(f"Failed to merge gitignore TOML files: {str(e)}")
-        # Fallback: возвращаем только дистрибутивные правила
+        # Fallback: return the distributed rules only
         try:
             with open(distributor_path, 'rb') as f:
                 data = tomllib.load(f)
@@ -306,25 +306,25 @@ def merge_gitignore_toml_files(distributor_path: str, user_path: str) -> Dict[st
 
 def deduplicate_patterns(patterns: List[str]) -> List[str]:
     """
-    Удаляет дублирующиеся паттерны, сохраняя порядок.
-    Оптимизирован для больших файлов.
+    Remove duplicate patterns, preserving order.
+    Optimised for large files.
     
     Args:
-        patterns: Список паттернов для дедупликации
+        patterns: patterns to deduplicate
         
     Returns:
-        Список уникальных паттернов
+        List of unique patterns
     """
     if not patterns:
         return []
     
-    # Для небольших списков используем простой алгоритм
+    # Small lists: use the simple algorithm
     if len(patterns) <= 100:
         seen = set()
         result = []
         
         for pattern in patterns:
-            # Убираем комментарии и лишние пробелы для сравнения
+            # Strip comments and stray whitespace before comparing
             clean_pattern = pattern.split('#')[0].strip()
             if clean_pattern and clean_pattern not in seen:
                 seen.add(clean_pattern)
@@ -332,22 +332,22 @@ def deduplicate_patterns(patterns: List[str]) -> List[str]:
         
         return result
     
-    # Для больших списков используем оптимизированный алгоритм
-    # с предварительной сортировкой для лучшей производительности
+    # Large lists: use the optimised algorithm
+    # with an up-front sort for speed
     seen = set()
     result = []
     
-    # Создаем список кортежей (clean_pattern, original_pattern) для сортировки
+    # Build (clean_pattern, original_pattern) tuples for sorting
     pattern_tuples = []
     for pattern in patterns:
         clean_pattern = pattern.split('#')[0].strip()
         if clean_pattern:
             pattern_tuples.append((clean_pattern, pattern))
     
-    # Сортируем по clean_pattern для группировки похожих паттернов
+    # Sort by clean_pattern to group similar patterns
     pattern_tuples.sort(key=lambda x: x[0])
     
-    # Удаляем дубликаты, сохраняя порядок оригинальных паттернов
+    # Drop duplicates, preserving the original order
     for clean_pattern, original_pattern in pattern_tuples:
         if clean_pattern not in seen:
             seen.add(clean_pattern)
@@ -358,13 +358,13 @@ def deduplicate_patterns(patterns: List[str]) -> List[str]:
 
 def merge_gitignore_rules() -> Dict[str, List[str]]:
     """
-    Объединяет правила gitignore из дистрибутивного и пользовательского файлов.
-    Использует кэширование для улучшения производительности.
+    Merge gitignore rules from the distributed and user files.
+    Results are cached for speed.
     
     Returns:
-        Объединенный словарь категорий и правил
+        Merged mapping of categories to rules
     """
-    # Проверяем кэш
+    # Check the cache
     if _is_cache_valid():
         logger.debug("Using cached gitignore rules")
         return _merge_cache.copy()
@@ -386,7 +386,7 @@ def merge_gitignore_rules() -> Dict[str, List[str]]:
             result = load_gitignore_rules()
             logger.info(f"Loaded distributor rules: {len(result)} categories")
         
-        # Обновляем кэш
+        # Refresh the cache
         _update_cache(result)
         return result
             
@@ -397,7 +397,7 @@ def merge_gitignore_rules() -> Dict[str, List[str]]:
         try:
             result = load_gitignore_rules()
             logger.info(f"Fallback successful: {len(result)} categories")
-            # Обновляем кэш даже для fallback
+            # Refresh the cache even on the fallback path
             _update_cache(result)
             return result
         except Exception as fallback_error:
@@ -407,17 +407,17 @@ def merge_gitignore_rules() -> Dict[str, List[str]]:
 
 def save_merged_gitignore_toml(content: Dict[str, List[str]], path: str) -> bool:
     """
-    Сохраняет мерженный контент в TOML файл.
+    Save the merged content to a TOML file.
     
     Args:
-        content: Словарь категорий и правил
-        path: Путь для сохранения файла
+        content: mapping of categories to rules
+        path: path to save the file to
         
     Returns:
-        True если сохранение успешно, False иначе
+        True if the file was saved, False otherwise
     """
     try:
-        # Валидируем входные данные
+        # Validate the input
         if not isinstance(content, dict):
             logger.error("Invalid content: not a dictionary")
             return False
@@ -426,7 +426,7 @@ def save_merged_gitignore_toml(content: Dict[str, List[str]], path: str) -> bool
             logger.warning("Empty content, nothing to save")
             return False
         
-        # Проверяем директорию
+        # Check the directory
         dir_path = os.path.dirname(path)
         if dir_path and not os.path.exists(dir_path):
             try:
@@ -436,7 +436,7 @@ def save_merged_gitignore_toml(content: Dict[str, List[str]], path: str) -> bool
                 logger.error(f"Failed to create directory {dir_path}: {str(e)}")
                 return False
         
-        # Создаем TOML структуру
+        # Build the TOML structure
         toml_data = {}
         for category, patterns in content.items():
             if isinstance(patterns, list):
@@ -444,21 +444,21 @@ def save_merged_gitignore_toml(content: Dict[str, List[str]], path: str) -> bool
             else:
                 logger.warning(f"Skipping invalid patterns for category {category}")
         
-        # Сохраняем в файл
+        # Save to the file
         try:
             with open(path, 'w', encoding='utf-8') as f:
-                # Записываем заголовок
+                # Write the header
                 f.write("# Merged gitignore rules from distributor and user files\n")
                 f.write("# Generated automatically by how_to_do\n\n")
                 
-                # Записываем каждую категорию
+                # Write each category
                 for category, data in toml_data.items():
                     f.write(f"####################################################################\n")
                     f.write(f"# [{category}] — {get_category_description(category)}\n")
                     f.write(f"{category} = {{ patterns = [\n")
                     
                     for pattern in data['patterns']:
-                        # Экранируем специальные символы в паттернах
+                        # Escape special characters in the patterns
                         escaped_pattern = pattern.replace('\\', '\\\\').replace('"', '\\"')
                         f.write(f"  \"{escaped_pattern}\",\n")
                     
@@ -481,63 +481,63 @@ def save_merged_gitignore_toml(content: Dict[str, List[str]], path: str) -> bool
 
 def get_category_description(category: str) -> str:
     """
-    Возвращает описание категории для комментария в TOML файле.
+    Return the category description used as a comment in the TOML file.
     
     Args:
-        category: Название категории
+        category: category name
         
     Returns:
-        Описание категории
+        Category description
     """
     descriptions = {
-        "OperatingSystem": "мусор ОС (macOS, Windows, Linux)",
-        "IDE": "файлы, генерируемые редакторами и IDE",
-        "BuildArtifacts": "результаты сборки, бинарники, кэш компиляций",
-        "Python": "файлы и каталоги, специфичные для Python-окружений",
-        "Java": "файлы и каталоги JVM, Gradle, Maven",
-        "NodeJS": "файлы и каталоги Node / frontend сборки",
-        "Go": "файлы и модули Go",
+        "OperatingSystem": "OS clutter (macOS, Windows, Linux)",
+        "IDE": "files generated by editors and IDEs",
+        "BuildArtifacts": "build output, binaries, compilation caches",
+        "Python": "files and directories specific to Python environments",
+        "Java": "JVM, Gradle and Maven files and directories",
+        "NodeJS": "Node and frontend build files and directories",
+        "Go": "Go files and modules",
         "Rust": "Rust Cargo",
         "DotNet": ".NET / C#",
-        "Android_iOS": "мобильная платформа Android / Xcode / Swift",
-        "Containers_CI": "Docker, Kubernetes, Terraform, CI/CD артефакты",
-        "Logs_Tmp": "журналы, кеши, временные файлы",
-        "LaTeX_Metadata": "LaTeX / Pandoc артефакты",
-        "Documentation": "doc-генерация (Sphinx, MkDocs, Hugo и т.п.)",
-        "CustomDiagnostics": "кастомные шаблоны"
+        "Android_iOS": "Android / Xcode / Swift mobile platforms",
+        "Containers_CI": "Docker, Kubernetes, Terraform, CI/CD artifacts",
+        "Logs_Tmp": "logs, caches, temporary files",
+        "LaTeX_Metadata": "LaTeX / Pandoc artifacts",
+        "Documentation": "generated documentation (Sphinx, MkDocs, Hugo and friends)",
+        "CustomDiagnostics": "custom templates"
     }
-    return descriptions.get(category, "пользовательская категория")
+    return descriptions.get(category, "user-defined category")
 
 
 def validate_merged_toml_structure(data: Dict[str, List[str]]) -> bool:
     """
-    Валидирует структуру мерженного TOML файла.
+    Validate the structure of the merged TOML file.
     
     Args:
-        data: Словарь категорий и правил для валидации
+        data: mapping of categories to rules to validate
         
     Returns:
-        True если структура корректна, False иначе
+        True if the structure is valid, False otherwise
     """
     try:
-        # Проверяем, что data является словарем
+        # data must be a dict
         if not isinstance(data, dict):
             logger.error("Invalid structure: data is not a dictionary")
             return False
         
-        # Проверяем каждую категорию
+        # Check each category
         for category_name, patterns in data.items():
-            # Проверяем название категории
+            # Check the category name
             if not isinstance(category_name, str) or not category_name.strip():
                 logger.error(f"Invalid category name: {category_name}")
                 return False
             
-            # Проверяем, что patterns является списком
+            # patterns must be a list
             if not isinstance(patterns, list):
                 logger.error(f"Invalid patterns for category {category_name}: not a list")
                 return False
             
-            # Проверяем каждый паттерн
+            # Check each pattern
             for i, pattern in enumerate(patterns):
                 if not isinstance(pattern, str):
                     logger.error(f"Invalid pattern at index {i} in category {category_name}: not a string")
